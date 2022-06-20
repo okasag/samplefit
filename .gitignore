@@ -1,0 +1,21 @@
+# pdf files
+*.pdf
+
+# graphic files
+*.jpeg
+*.jpg
+
+# excel files
+*.xlsx
+
+# osx files
+.DS_Store
+
+# cache files
+/samplefit/__pycache__/
+*.pyc
+
+# exclude data from tox
+/.tox/*
+/samplefit.egg-info/*
+MANIFEST
