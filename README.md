@@ -41,7 +41,7 @@ model_fit.summary()
 
 Assess sample fit:
 ```python
-sample = sf.RSR(model=model)
+sample = sf.RSR(linear_model=model)
 sample_fit = sample.fit()
 sample_fit.summary()
 ```
