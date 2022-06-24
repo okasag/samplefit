@@ -6,7 +6,7 @@ import statsmodels.api as sm
 
 # get data 
 boston = sm.datasets.get_rdataset("Boston", "MASS")
-Y = boston.data['medv'] # median house price
+Y = boston.data['medv'] # median home value
 X = boston.data['rm'] # number of rooms
 X = sm.add_constant(X)
 
@@ -16,7 +16,7 @@ model_fit = model.fit()
 model_fit.summary()
 
 # assess sample fit
-sample = sf.RSR(model=model)
+sample = sf.RSR(linear_model=model)
 sample_fit = sample.fit()
 sample_fit.summary()
 

@@ -1020,7 +1020,6 @@ class BaseRSRScoreResults:
         self.n_subsamples = self.sample.n_subsamples
         self.sample_fraction = self.sample.sample_fraction
         self.loss = self.sample.loss
-        self.n_boot = self.sample.n_boot
 
         # get the scores and compute gini coef
         self.scores = self.sample.scores
@@ -1057,7 +1056,7 @@ class BaseRSRScoreResults:
                               s=7.5)
             # add titles, ticks, etc.
             ax.title.set_text(self.title)
-            ax.set_xlabel(self.xname)
+            ax.set_xlabel(var_name)
             ax.set_ylabel(self.yname)
             # set limits if specified
             if not self.ylim is None:

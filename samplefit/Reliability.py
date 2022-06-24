@@ -20,7 +20,7 @@ class RSR(BaseRSR):
 
     Parameters
     ----------
-    model : model class from statsmodels
+    linear_model : statsmodels class
         Linear model specified via statsmodels OLS or GLM class.
     n_samples : int
         The number of samples in the sub-sampling. The default is 1000.
@@ -83,7 +83,7 @@ class RSR(BaseRSR):
     model_fit.summary()
     
     # assess sample fit
-    sample = sf.RSR(model=model)
+    sample = sf.RSR(linear_model=model)
     sample_fit = sample.fit()
     sample_fit.summary()
     
@@ -99,7 +99,7 @@ class RSR(BaseRSR):
 
     # define init function
     def __init__(self,
-                 model=None,
+                 linear_model=None,
                  n_samples=1000,
                  sample_fraction=0.5,
                  loss=None,
@@ -107,7 +107,7 @@ class RSR(BaseRSR):
                  random_state=None):
         # access inherited methods
         super().__init__(
-            model=model,
+            linear_model=linear_model,
             n_samples=n_samples,
             sample_fraction=sample_fraction,
             loss=loss,
@@ -169,7 +169,7 @@ class RSR(BaseRSR):
         model = sm.OLS(endog=Y, exog=X)
         
         # specify sample
-        sample = sf.RSR(model=model)
+        sample = sf.RSR(linear_model=model)
         
         # sample fit with defaults
         sample_fit = sample.fit()
@@ -234,7 +234,7 @@ class RSR(BaseRSR):
         model = sm.OLS(endog=Y, exog=X)
         
         # specify sample
-        sample = sf.RSR(model=model)
+        sample = sf.RSR(linear_model=model)
         
         # score reliability
         sample_scores = sample.score()
@@ -293,7 +293,7 @@ class RSR(BaseRSR):
         model = sm.OLS(endog=Y, exog=X)
         
         # specify sample
-        sample = sf.RSR(model=model)
+        sample = sf.RSR(linear_model=model)
         
         # sample annealing with defaults
         sample_annealing = sample.anneal()
@@ -391,7 +391,7 @@ class RSRFitResults(BaseRSRFitResults):
         model = sm.OLS(endog=Y, exog=X)
         
         # specify sample
-        sample = sf.RSR(model=model)
+        sample = sf.RSR(linear_model=model)
         
         # sample fit
         sample_fit = sample.fit()
@@ -454,7 +454,7 @@ class RSRFitResults(BaseRSRFitResults):
         model = sm.OLS(endog=Y, exog=X)
         
         # specify sample
-        sample = sf.RSR(model=model)
+        sample = sf.RSR(linear_model=model)
         
         # sample fit
         sample_fit = sample.fit()
@@ -526,7 +526,7 @@ class RSRFitResults(BaseRSRFitResults):
         model = sm.OLS(endog=Y, exog=X)
         
         # specify sample
-        sample = sf.RSR(model=model)
+        sample = sf.RSR(linear_model=model)
         
         # sample fit
         sample_fit = sample.fit()
@@ -639,7 +639,7 @@ class RSRAnnealResults(BaseRSRAnnealResults):
         model = sm.OLS(endog=Y, exog=X)
         
         # specify sample
-        sample = sf.RSR(model=model)
+        sample = sf.RSR(linear_model=model)
         
         # sample annealing
         sample_annealing = sample.anneal()
@@ -708,7 +708,7 @@ class RSRAnnealResults(BaseRSRAnnealResults):
         model = sm.OLS(endog=Y, exog=X)
         
         # specify sample
-        sample = sf.RSR(model=model)
+        sample = sf.RSR(linear_model=model)
         
         # sample annealing
         sample_annealing = sample.anneal()
@@ -807,7 +807,7 @@ class RSRScoreResults(BaseRSRScoreResults):
         model = sm.OLS(endog=Y, exog=X)
         
         # specify sample
-        sample = sf.RSR(model=model)
+        sample = sf.RSR(linear_model=model)
         
         # sample annealing
         sample_annealing = sample.anneal()

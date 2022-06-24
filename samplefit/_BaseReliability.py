@@ -33,7 +33,7 @@ class BaseRSR:
 
     # define init function
     def __init__(self,
-                 model=None,
+                 linear_model=None,
                  n_samples=1000,
                  sample_fraction=0.5,
                  loss=None,
@@ -41,7 +41,7 @@ class BaseRSR:
                  random_state=None):
 
         # assign input values
-        self.model = model
+        self.linear_model = linear_model
         self.n_samples = n_samples
         self.sample_fraction = sample_fraction
         self.loss = loss
@@ -56,7 +56,7 @@ class BaseRSR:
         """Input checks for the RSR class init."""
         
         # check and define the input parameters
-        model = self.model
+        linear_model = self.linear_model
         n_samples = self.n_samples
         sample_fraction = self.sample_fraction
         loss = self.loss
@@ -68,29 +68,30 @@ class BaseRSR:
         family_set = [statsmodels.genmod.families.family.Gaussian]
 
         # check the model input
-        if isinstance(model,
+        if isinstance(linear_model,
                       (statsmodels.genmod.generalized_linear_model.GLM,
                        statsmodels.regression.linear_model.OLS)):
             # if GLM, check if its Gaussian
-            if isinstance(model,
+            if isinstance(linear_model,
                           (statsmodels.genmod.generalized_linear_model.GLM)):
                 # check if GLM family is supported
-                if type(model.family) in family_set:
+                if type(linear_model.family) in family_set:
                     # assign the value
-                    self.model = model
+                    self.linear_model = linear_model
                 else:
                     # raise type error
-                    raise TypeError(f'{type(model.family)} is not supported. '
-                                     f'Only: {family_set} are available.')
+                    raise TypeError(f'{type(linear_model.family)} is not '
+                                    'supported. '
+                                    f'Only: {family_set} are available.')
             else:
                 # assign the value (OLS class has same structure as GLM class)
-                self.model = model
+                self.linear_model = linear_model
         else:
             # raise value error
-            raise ValueError('model must be a class of '
+            raise ValueError('linear_model must be a class of '
                              'statsmodels.regression.linear_model.OLS or '
                              'statsmodels.genmod.generalized_linear_model.GLM'
-                             f', got {type(model)}.')
+                             f', got {type(linear_model)}.')
 
 
         # check the number of subsampling iterations
@@ -183,13 +184,13 @@ class BaseRSR:
         max_int = np.iinfo(np.int32).max
         
         # get exog and endog
-        self.exog = self.model.data.exog
-        self.endog = self.model.data.endog
+        self.exog = self.linear_model.data.exog
+        self.endog = self.linear_model.data.endog
         
         # initiliaze exog names, observations, etc
-        self.exog_names = self.model.data.cov_names
-        self.n_obs = int(self.model.nobs)
-        self.n_exog = self.model.exog.shape[1]
+        self.exog_names = self.linear_model.data.cov_names
+        self.n_obs = int(self.linear_model.nobs)
+        self.n_exog = self.linear_model.exog.shape[1]
         
         # get the number of observations to subsample
         self.n_subsamples = round(self.sample_fraction * self.n_obs)
