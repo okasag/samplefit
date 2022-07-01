@@ -24,15 +24,25 @@ class RSR(BaseRSR):
         Linear model specified via statsmodels OLS or GLM class.
     n_samples : int
         The number of samples in the sub-sampling. The default is 1000.
-    sample_fraction : float
-        Sub-sampling share, i.e. the share of observations to draw from
-        the data without replacement. The default is 0.5.
+    min_samples : int, float or NoneType
+        Minimum number of observations for each subsample, i.e. number of
+        observations to draw from the data without replacement. If integer
+        supplied, exact number of observation is sampeld. If float, share of
+        full sample is considered (rounded up). If None, the minimum number of
+        observations to estimate the model is selected, i.e p+1, where p is
+        number of model parameters. The default is None.
     loss : str or lambda function
         Loss function for evaluation of the estimation errors. Loss must be
         either 'squared_error' or 'absolute_error'. For a user defined loss
         function, user can directly supply own lambda function of type:
-        'lambda y, yhat:'. Default is 'squared_error'.
-    n_jobs : int or None
+        'lambda y, yhat:'. Default is 'absolute_error'.
+    boost : float or NoneType
+        Share of sample that should be boosted, i.e. the share of observations
+        that is sequentially dropped from the sample based on the iteratively
+        lowest reliability scores. The final boosted reliability scores are
+        then estimated based on the boosted sample that excludes boost \% of
+        the most unreliable observations from the sample. The default is None.
+    n_jobs : int or NoneType
         The number of parallel jobs to be used for multithreading in
         [`.fit()`](#samplefit.Reliability.RSR.fit),
         [`.score()`](#samplefit.Reliability.RSR.score) and
@@ -101,16 +111,18 @@ class RSR(BaseRSR):
     def __init__(self,
                  linear_model=None,
                  n_samples=1000,
-                 sample_fraction=0.5,
+                 min_samples=None,
                  loss=None,
+                 boost=None,
                  n_jobs=-1,
                  random_state=None):
         # access inherited methods
         super().__init__(
             linear_model=linear_model,
             n_samples=n_samples,
-            sample_fraction=sample_fraction,
+            min_samples=min_samples,
             loss=loss,
+            boost=boost,
             n_jobs=n_jobs,
             random_state=random_state
         )
@@ -126,8 +138,10 @@ class RSR(BaseRSR):
         Parameters
         ----------
         weights : array-like of shape (n_obs, 1) or NoneType
-            An array of weights for weighted regression. If None, reliability
-            scores will be used as weights as a default. Default is None.
+            An array of weights for weighted regression. If None, squared
+            reliability scores will be used as weights as a default. Note, that
+            if bootstrapping is used for inference, the estimation of
+            user-supplied weights is not reflected. Default is None.
         consensus : str or NoneType
             Type of optimization for consensus fit. Currently only
             'second_derivative' is supported. If None, weighted fit is
@@ -580,7 +594,9 @@ class RSRAnnealResults(BaseRSRAnnealResults):
              percentile=False,
              color=None,
              path=None,
-             figsize=None):
+             figsize=None,
+             ylim=None,
+             xlabel=None):
         """
         Plot the Annealing based on the reliability scores via the RSR
         of class `Sample()`.
@@ -610,6 +626,10 @@ class RSRAnnealResults(BaseRSRAnnealResults):
         figsize : tuple or NoneType
             Tuple of x and y axis size for matplotlib figsize argument.
             Default is (10,5).
+        ylim : tuple, list or NoneType
+            Tuple of upper and lower limits of y axis. Default is automatic.
+        xlabel : str or NoneType
+            Label for the x axis for the exog variable. Default is 'xname'.
             
 
         Returns
@@ -658,7 +678,9 @@ class RSRAnnealResults(BaseRSRAnnealResults):
             percentile=percentile,
             color=color,
             path=path,
-            figsize=figsize
+            figsize=figsize,
+            ylim=ylim,
+            xlabel=xlabel
             )
     
     
@@ -751,7 +773,9 @@ class RSRScoreResults(BaseRSRScoreResults):
              cmap=None,
              path=None,
              figsize=None,
-             ylim=None):
+             s=None,
+             ylim=None,
+             xlabel=None):
         """
         Plot the Reliability Scores based on the RSR algorithm.
         
@@ -776,8 +800,13 @@ class RSRScoreResults(BaseRSRScoreResults):
         figsize : tuple or NoneType
             Tuple of x and y axis size for matplotlib figsize argument.
             Default is (10,5).
+        s : float or NoneType
+            The marker size in points**2 for in matplotlib scatter plot.
+            Default is automatic.
         ylim : tuple, list or NoneType
             Tuple of upper and lower limits of y axis. Default is automatic.
+        xlabel : str or NoneType
+            Label for the x axis for the exog variable. Default is 'xname'.
             
 
         Returns
@@ -826,5 +855,7 @@ class RSRScoreResults(BaseRSRScoreResults):
             cmap=cmap,
             path=path,
             figsize=figsize,
-            ylim=ylim
+            s=s,
+            ylim=ylim,
+            xlabel=xlabel
             )

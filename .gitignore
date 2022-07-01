@@ -14,8 +14,13 @@
 # cache files
 /samplefit/__pycache__/
 *.pyc
+.ipynb_checkpoints
 
 # exclude data from tox
 /.tox/*
 /samplefit.egg-info/*
 MANIFEST
+
+# exclude testing files
+samplefit_replication.ipynb
+samplefit_testing.ipynb

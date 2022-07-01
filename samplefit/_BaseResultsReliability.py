@@ -16,6 +16,7 @@ import samplefit.Reliability as Reliability
 import numpy as np # (hast to be 1.22.0 at least, due to np.percentile changes)
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 
 # import submodules and functions
 from scipy import stats
@@ -148,9 +149,9 @@ class BaseRSRFitResults:
         self.n_exog = self.sample.n_exog
         
         # get the class inputs
-        self.n_subsamples = self.sample.n_subsamples
-        self.sample_fraction = self.sample.sample_fraction
+        self.min_samples = self.sample.min_samples
         self.loss = self.sample.loss
+        self.boost = self.sample.boost
         self.n_boot = self.sample.n_boot
         self.weights = self.sample.weights
 
@@ -223,8 +224,8 @@ class BaseRSRFitResults:
         
         # get the preamble
         # info abour RSR
-        rsr_info = ['No. Subsamples:', 'Subsample %:', 'Loss:', 'Gini:']
-        rsr_out = [self.n_subsamples, np.round(self.sample_fraction, 4),
+        rsr_info = ['No. Samples:', 'Min. Samples:', 'Loss:', 'Gini:']
+        rsr_out = [self.sample.n_samples, self.min_samples,
                    self.loss, np.round(self.gini, 4)]
         # info about fit
         fit_info = ['Dep. Variable:', 'No. Observations:', 'Df Residuals:',
@@ -639,9 +640,9 @@ class BaseRSRAnnealResults:
         self.n_exog = self.sample.n_exog
         
         # get the class inputs
-        self.n_subsamples = self.sample.n_subsamples
-        self.sample_fraction = self.sample.sample_fraction
+        self.min_samples = self.sample.min_samples
         self.loss = self.sample.loss
+        self.boost = self.sample.boost
         self.share = self.sample.share
         self.n_boot = self.sample.n_boot
 
@@ -653,13 +654,14 @@ class BaseRSRAnnealResults:
     # %% in-class functions
     # function to plot annealing sensitivity
     def plot(self, xname=None, title=None, alpha=0.05, percentile=False,
-             color=None, path=None, figsize=None, ylim=None):
+             color=None, path=None, figsize=None, ylim=None, xlabel=None):
         """
         RSR Annealing Sensitivity Plot.
         """
         
         # check inputs for plot
-        self._check_plot_inputs(xname, title, color, path, figsize, ylim)
+        self._check_plot_inputs(
+            xname, title, color, path, figsize, ylim, xlabel)
         
         # check if confidence intervals should be plotted too
         if not alpha is None:
@@ -675,6 +677,7 @@ class BaseRSRAnnealResults:
         
         # get storage
         figures = {}
+        iter_idx = 0
         
         # plot for each xname
         for var_name in self.xname:
@@ -686,7 +689,7 @@ class BaseRSRAnnealResults:
 
             # plot annealing fit
             ax.plot(range(x_width), self.params[:, var_idx], color='black',
-                    label=var_name)
+                    label=self.xlabel[iter_idx])
             # set limits if specified
             if not self.ylim is None:
                 ax.set_ylim(self.ylim)
@@ -726,6 +729,8 @@ class BaseRSRAnnealResults:
             
             # save figure
             figures[var_name] = (fig, ax)
+            # update index
+            iter_idx += 1
         
         # asign figures to self
         self.figures = figures
@@ -790,7 +795,8 @@ class BaseRSRAnnealResults:
     
     
     # fucntion to check inputs for plot function
-    def _check_plot_inputs(self, xname, title, color, path, figsize, ylim):
+    def _check_plot_inputs(self,
+                           xname, title, color, path, figsize, ylim, xlabel):
         """Input checks for the .plot() function."""
         
         # check xname
@@ -803,8 +809,8 @@ class BaseRSRAnnealResults:
             if isinstance(xname, str):
                 # check in
                 if xname in self.exog_names:
-                    # assign the input value
-                    self.xname = xname
+                    # assign the input value as list
+                    self.xname = [xname]
                 else:
                     # raise value error
                     raise ValueError("xname must be one of:" +
@@ -894,6 +900,36 @@ class BaseRSRAnnealResults:
             # raise value error
             raise ValueError("ylim must be a tuple or a list"
                              ", got %s" % type(ylim))
+        
+        # check xname
+        if xlabel is None:
+            # plot xname as default
+            self.xlabel = self.xname
+        # otherwise check inputs
+        elif isinstance(xlabel, (list, tuple, str)):
+            # check if they are admissible
+            if isinstance(xlabel, str):
+                # check in
+                if len(self.xname) == 1:
+                    # assign the input value as list
+                    self.xlabel = [xlabel]
+                else:
+                    # raise value error
+                    raise ValueError("xlabel must be of same length as xname"
+                                     ", got a single string.")
+            else:
+                # check if length of tuple and list matches xname
+                if len(self.xname) == len(xlabel):
+                    # assign the input value
+                    self.xlabel = xlabel
+                else:
+                    # raise value error
+                    raise ValueError("xlabel must be of same length as xname"
+                                     ", got %s" % len(xlabel))
+        else:
+            # raise value error
+            raise ValueError("xlabel must be one of tuple, list or string"
+                             ", got %s" % type(xlabel))
     
     
     # function to compute conf intervals via asymptotic approximation
@@ -1017,9 +1053,9 @@ class BaseRSRScoreResults:
         self.n_exog = self.sample.n_exog
         
         # get the class inputs
-        self.n_subsamples = self.sample.n_subsamples
-        self.sample_fraction = self.sample.sample_fraction
+        self.min_samples = self.sample.min_samples
         self.loss = self.sample.loss
+        self.boost = self.sample.boost
 
         # get the scores and compute gini coef
         self.scores = self.sample.scores
@@ -1029,16 +1065,18 @@ class BaseRSRScoreResults:
     # %% in-class functions
     # function to plot annealing sensitivity
     def plot(self, yname=None, xname=None, title=None, cmap=None, path=None,
-             figsize=None, ylim=None):
+             figsize=None, s=None, ylim=None, xlabel=None):
         """
         RSR Reliability Scores Plot.
         """
         
         # check inputs for plot
-        self._check_plot_inputs(yname, xname, title, cmap, path, figsize, ylim)
+        self._check_plot_inputs(
+            yname, xname, title, cmap, path, figsize, s, ylim, xlabel)
         
         # get storage
         figures = {}
+        iter_idx = 0
         
         # plot for each xname
         for var_name in self.xname:
@@ -1053,10 +1091,10 @@ class BaseRSRScoreResults:
                               y=self.endog,
                               c=self.scores,
                               cmap=self.cmap,
-                              s=7.5)
+                              s=self.s)
             # add titles, ticks, etc.
             ax.title.set_text(self.title)
-            ax.set_xlabel(var_name)
+            ax.set_xlabel(self.xlabel[iter_idx])
             ax.set_ylabel(self.yname)
             # set limits if specified
             if not self.ylim is None:
@@ -1083,6 +1121,8 @@ class BaseRSRScoreResults:
             
             # save figure
             figures[var_name] = (fig, ax, plot)
+            # update index
+            iter_idx += 1
         
         # asign figures to self
         self.figures = figures
@@ -1092,8 +1132,8 @@ class BaseRSRScoreResults:
 
 
     # check inputs for score plot
-    def _check_plot_inputs(self, yname, xname, title, cmap, path, figsize,
-                           ylim):
+    def _check_plot_inputs(self, yname, xname, title, cmap, path, figsize, s,
+                           ylim, xlabel):
         """Input checks for the .plot() function."""
         
         # check name for y
@@ -1119,8 +1159,8 @@ class BaseRSRScoreResults:
             if isinstance(xname, str):
                 # check in
                 if xname in self.exog_names:
-                    # assign the input value
-                    self.xname = xname
+                    # assign the input value wrapped in a list
+                    self.xname = [xname]
                 else:
                     # raise value error
                     raise ValueError("xname must be one of:" +
@@ -1210,3 +1250,45 @@ class BaseRSRScoreResults:
             # raise value error
             raise ValueError("ylim must be a tuple or a list"
                              ", got %s" % type(ylim))
+        
+        # check markersize s
+        if s is None:
+            # set default auto
+            self.s = mpl.rcParams['lines.markersize'] ** 2
+        # if supplied check if its valid
+        elif isinstance(s, (float, int)):
+            # set value to user supplied
+            self.s = s
+        else:
+            # raise value error
+            raise ValueError("s must be float or int"
+                             ", got %s" % type(s))
+        
+        # check xname
+        if xlabel is None:
+            # plot xname as default
+            self.xlabel = self.xname
+        # otherwise check inputs
+        elif isinstance(xlabel, (list, tuple, str)):
+            # check if they are admissible
+            if isinstance(xlabel, str):
+                # check in
+                if len(self.xname) == 1:
+                    # assign the input value as list
+                    self.xlabel = [xlabel]
+                else:
+                    # raise value error
+                    raise ValueError("xlabel must be of same length as xname"
+                                     ", got a single string.")
+            else:
+                # check if length of tuple and list matches xname
+                if len(self.xname) == len(xlabel):
+                    # assign the input value
+                    self.xlabel = xlabel
+                else:
+                    # raise value error
+                    raise ValueError("xlabel must be of same length as xname"
+                                     ", got %s" % len(xlabel))
+        else:
+            # raise value error
+            raise ValueError("xlabel must be one of tuple, list or string")
