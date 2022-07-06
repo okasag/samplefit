@@ -596,7 +596,8 @@ class RSRAnnealResults(BaseRSRAnnealResults):
              path=None,
              figsize=None,
              ylim=None,
-             xlabel=None):
+             xlabel=None,
+             dpi=None):
         """
         Plot the Annealing based on the reliability scores via the RSR
         of class `Sample()`.
@@ -630,6 +631,8 @@ class RSRAnnealResults(BaseRSRAnnealResults):
             Tuple of upper and lower limits of y axis. Default is automatic.
         xlabel : str or NoneType
             Label for the x axis for the exog variable. Default is 'xname'.
+        dpi : float, int or NoneType
+            The resolution for matplotlib scatter plot. Default is 100.
             
 
         Returns
@@ -680,7 +683,8 @@ class RSRAnnealResults(BaseRSRAnnealResults):
             path=path,
             figsize=figsize,
             ylim=ylim,
-            xlabel=xlabel
+            xlabel=xlabel,
+            dpi=dpi
             )
     
     
@@ -775,7 +779,8 @@ class RSRScoreResults(BaseRSRScoreResults):
              figsize=None,
              s=None,
              ylim=None,
-             xlabel=None):
+             xlabel=None,
+             dpi=None):
         """
         Plot the Reliability Scores based on the RSR algorithm.
         
@@ -800,13 +805,15 @@ class RSRScoreResults(BaseRSRScoreResults):
         figsize : tuple or NoneType
             Tuple of x and y axis size for matplotlib figsize argument.
             Default is (10,5).
-        s : float or NoneType
+        s : float, int or NoneType
             The marker size in points**2 for in matplotlib scatter plot.
             Default is automatic.
         ylim : tuple, list or NoneType
             Tuple of upper and lower limits of y axis. Default is automatic.
         xlabel : str or NoneType
             Label for the x axis for the exog variable. Default is 'xname'.
+        dpi : float, int or NoneType
+            The resolution for matplotlib scatter plot. Default is 100.
             
 
         Returns
@@ -857,5 +864,6 @@ class RSRScoreResults(BaseRSRScoreResults):
             figsize=figsize,
             s=s,
             ylim=ylim,
-            xlabel=xlabel
+            xlabel=xlabel,
+            dpi=dpi
             )

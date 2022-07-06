@@ -653,15 +653,20 @@ class BaseRSRAnnealResults:
 
     # %% in-class functions
     # function to plot annealing sensitivity
-    def plot(self, xname=None, title=None, alpha=0.05, percentile=False,
-             color=None, path=None, figsize=None, ylim=None, xlabel=None):
+    def plot(self,
+             xname=None, title=None, alpha=0.05, percentile=False, color=None,
+             path=None, figsize=None, ylim=None, xlabel=None, dpi=None):
         """
         RSR Annealing Sensitivity Plot.
         """
         
         # check inputs for plot
         self._check_plot_inputs(
-            xname, title, color, path, figsize, ylim, xlabel)
+            xname, title, color, path, figsize, ylim, xlabel, dpi)
+        
+        # set resolution
+        plt.rcParams['figure.dpi'] = self.dpi
+        plt.rcParams['savefig.dpi'] = self.dpi
         
         # check if confidence intervals should be plotted too
         if not alpha is None:
@@ -734,6 +739,10 @@ class BaseRSRAnnealResults:
         
         # asign figures to self
         self.figures = figures
+        
+        # reset resolution
+        plt.rcParams['figure.dpi'] = 80
+        plt.rcParams['savefig.dpi'] = 100
 
         # empty return
         return None
@@ -795,8 +804,8 @@ class BaseRSRAnnealResults:
     
     
     # fucntion to check inputs for plot function
-    def _check_plot_inputs(self,
-                           xname, title, color, path, figsize, ylim, xlabel):
+    def _check_plot_inputs(self, xname, title, color, path, figsize, ylim,
+                           xlabel, dpi):
         """Input checks for the .plot() function."""
         
         # check xname
@@ -930,6 +939,19 @@ class BaseRSRAnnealResults:
             # raise value error
             raise ValueError("xlabel must be one of tuple, list or string"
                              ", got %s" % type(xlabel))
+        
+        # check dpi
+        if dpi is None:
+            # set default auto as in matplotlib
+            self.dpi = 100
+        # if supplied check if its valid
+        elif isinstance(dpi, (float, int)):
+            # set value to user supplied
+            self.dpi = dpi
+        else:
+            # raise value error
+            raise ValueError("dpi must be float or int"
+                             ", got %s" % type(dpi))
     
     
     # function to compute conf intervals via asymptotic approximation
@@ -1064,20 +1086,24 @@ class BaseRSRScoreResults:
 
     # %% in-class functions
     # function to plot annealing sensitivity
-    def plot(self, yname=None, xname=None, title=None, cmap=None, path=None,
-             figsize=None, s=None, ylim=None, xlabel=None):
+    def plot(self,yname=None, xname=None, title=None, cmap=None, path=None,
+             figsize=None, s=None, ylim=None, xlabel=None, dpi=None):
         """
         RSR Reliability Scores Plot.
         """
         
         # check inputs for plot
-        self._check_plot_inputs(
-            yname, xname, title, cmap, path, figsize, s, ylim, xlabel)
+        self._check_plot_inputs(yname, xname, title, cmap, path, figsize, s,
+                                ylim, xlabel, dpi)
         
+        # set resolution
+        plt.rcParams['figure.dpi'] = self.dpi
+        plt.rcParams['savefig.dpi'] = self.dpi
+
         # get storage
         figures = {}
         iter_idx = 0
-        
+
         # plot for each xname
         for var_name in self.xname:
             # get the variable idx
@@ -1126,6 +1152,10 @@ class BaseRSRScoreResults:
         
         # asign figures to self
         self.figures = figures
+        
+        # restore the original resolution
+        plt.rcParams['figure.dpi'] = 80
+        plt.rcParams['savefig.dpi'] = 100
 
         # empty return
         return None
@@ -1133,7 +1163,7 @@ class BaseRSRScoreResults:
 
     # check inputs for score plot
     def _check_plot_inputs(self, yname, xname, title, cmap, path, figsize, s,
-                           ylim, xlabel):
+                           ylim, xlabel, dpi):
         """Input checks for the .plot() function."""
         
         # check name for y
@@ -1292,3 +1322,16 @@ class BaseRSRScoreResults:
         else:
             # raise value error
             raise ValueError("xlabel must be one of tuple, list or string")
+        
+        # check dpi
+        if dpi is None:
+            # set default auto as in matplotlib
+            self.dpi = 100
+        # if supplied check if its valid
+        elif isinstance(dpi, (float, int)):
+            # set value to user supplied
+            self.dpi = dpi
+        else:
+            # raise value error
+            raise ValueError("dpi must be float or int"
+                             ", got %s" % type(dpi))

@@ -368,9 +368,10 @@ class BaseRSR:
             
         # controls for the optimization
         iter_loss_value = {}
+        sample_idx = 0
         
         # start sampling loop
-        for sample_idx in range(n_samples):
+        while sample_idx < n_samples:
             
             # initiate loss vector with NAs
             loss_value = np.empty(len(endog))
@@ -389,6 +390,14 @@ class BaseRSR:
             endog_out = endog[oob_idx]
             exog_out = exog[oob_idx, :]
     
+            # check if the sample is valid
+            if self._is_sample_valid(exog_in):
+                # update sample_idx
+                sample_idx +=1
+            else:
+                # continue with new draw
+                continue
+            
             # estimate the betas
             betas = np.linalg.inv(exog_in.T @ exog_in) @ (exog_in.T @ endog_in)
             # predict out-of-bag
@@ -446,9 +455,10 @@ class BaseRSR:
         # estimate boosted rsr scores now for all observations 
         # controls for the optimization
         iter_loss_value = {}
+        sample_idx = 0
         
         # start sampling loop
-        for sample_idx in range(n_samples):
+        while sample_idx < n_samples:
             
             # initiate loss vector with NAs
             loss_value = np.empty(len(endog))
@@ -469,6 +479,14 @@ class BaseRSR:
             # out of bag plus out of sample observations
             endog_out = endog[out_idx]
             exog_out = exog[out_idx, :]
+            
+            # check if the sample is valid
+            if self._is_sample_valid(exog_in):
+                # update sample_idx
+                sample_idx +=1
+            else:
+                # continue with new draw
+                continue
     
             # estimate the betas
             betas = np.linalg.inv(exog_in.T @ exog_in) @ (exog_in.T @ endog_in)
@@ -506,7 +524,26 @@ class BaseRSR:
         
         # return the gini coef
         return gini
-    
+
+
+    # function to chekc if sampled data is valid
+    def _is_sample_valid(self, matrix=None):
+        """Check if sampled covariate matrix has full rank."""
+        
+        # compute the matrix rank
+        rank = np.linalg.matrix_rank(matrix)
+        
+        # if the matrix has full rank
+        if (rank == self.n_exog):
+            # update sampling index
+            valid = True
+        else:
+            # otherwise do not update
+            valid = False
+        
+        # return the valid value
+        return valid
+
     
     # function to estimate the standard errors via asymptotic approximation
     def _asym_se(self, residuals=None, weights=None, weighted=None):
