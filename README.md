@@ -2,17 +2,28 @@
 
 `samplefit` is a Python library to assess sample fit, as opposed to model fit, via the Random Sample Reliability algorithm as developed by Okasa & Younge (2022). `samplefit` is built upon the `statsmodels` library (Seabold & Perktold, 2010) and follows the same command workflow.
 
+Copyright (c) 2022 Gabriel Okasa & Kenneth A. Younge.
+
+	AUTHOR:  Gabriel Okasa & Kenneth A. Younge
+	SOURCE:  https://github.com/okasag/samplefit
+	LICENSE: Access to this code is provided under an MIT License.
+
+Repo maintainer: Gabriel Okasa ([gabriel.okasa@epfl.ch](mailto:gabriel.okasa@epfl.ch))
+
 ## Introduction
 
 Researchers frequently test model fit by holding data constant and varying the model. We propose Random Sample Reliability (RSR) as a computational framework to test sample fit by holding the model constant and varying the data. Random Sample Reliability re-samples data to estimate the reliability of observations of a sample. RSR can be used to score the reliability of every observation within the sample, test the sensitivity of results to atypical observations via annealing procedure, and estimate a weighted fit where the analysis is more robust.
 
 ## Installation
 
-To install the latest `PyPi` released version run
+To clone this repo for the `samplefit` library run:
 
 ```
-pip install samplefit
+git clone https://github.com/okasag/samplefit.git
 ```
+
+The required modules can be installed by navigating to the root of this project and
+executing the following command: `pip install -r requirements.txt`.
 
 ## Example
 
@@ -60,5 +71,5 @@ sample_annealing.plot()
 
 ## References
 
-- Okasa, Gabriel, and Kenneth A. Younge. “Sample Fit: Random Sample Reliability.” arXiv preprint arXiv:xxxx.xxxxx. 2022.
+- Okasa, Gabriel, and Kenneth A. Younge. “Random Sample Reliability.” Working Paper. 2022.
 - Seabold, Skipper, and Josef Perktold. “statsmodels: Econometric and statistical modeling with python.” Proceedings of the 9th Python in Science Conference. 2010.

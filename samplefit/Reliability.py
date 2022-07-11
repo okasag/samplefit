@@ -41,7 +41,9 @@ class RSR(BaseRSR):
         that is sequentially dropped from the sample based on the iteratively
         lowest reliability scores. The final boosted reliability scores are
         then estimated based on the boosted sample that excludes boost \% of
-        the most unreliable observations from the sample. The default is None.
+        the most unreliable observations from the sample. Boosting should be
+        applied only when there is a prior knowledge of the outlier share.
+        The default is None.
     n_jobs : int or NoneType
         The number of parallel jobs to be used for multithreading in
         [`.fit()`](#samplefit.Reliability.RSR.fit),

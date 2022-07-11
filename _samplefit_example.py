@@ -4,7 +4,7 @@
 import samplefit as sf
 import statsmodels.api as sm
 
-# get data 
+# get data
 boston = sm.datasets.get_rdataset("Boston", "MASS")
 Y = boston.data['medv'] # median home value
 X = boston.data['rm'] # number of rooms

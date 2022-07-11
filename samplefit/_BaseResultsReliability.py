@@ -71,7 +71,7 @@ class BaseRSRFitResults:
         else:
             # raise value error
             raise ValueError('sample must be a class of '
-                             'SampleFit.Reliability.RSR '
+                             'samplefit.Reliability.RSR '
                              f', got {type(sample)}.')
 
         # check the estimated parameters is an array

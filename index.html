@@ -1,0 +1,2514 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>samplefit API documentation</title>
+<meta name="description" content="Description
+A Python implementation of the Random Sample Reliability (RSR) algorithm as
+developed in Okasa &amp; Younge (2022). The RSR estimates the …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title"><code>samplefit</code>: Random Sample Reliability</h1>
+</header>
+<section id="section-intro">
+<h2 id="description">Description</h2>
+<p>A Python implementation of the Random Sample Reliability (RSR) algorithm as
+developed in Okasa &amp; Younge (2022). The RSR estimates the reliability scores
+for each observation within the sample. The RSR reliability scores reflect
+the reverse of an average estimation loss resulting from a resampling
+procedure. These scores can be further used for an annealing sensitivity
+analysis to assess the impact of unreliable observations, or for a weighted
+regression or a consensus estimation to reduce the impact of less reliable
+observations.</p>
+<h2 id="installation">Installation</h2>
+<p>To clone the repo for the <code><a title="samplefit" href="#samplefit">samplefit</a></code> library run:</p>
+<pre><code>git clone https://github.com/okasag/samplefit.git
+</code></pre>
+<p><code><a title="samplefit" href="#samplefit">samplefit</a></code> relies on Python 3 and requires the following dependencies:</p>
+<ul>
+<li>numpy (&gt;=1.22.0)</li>
+<li>pandas (&gt;=1.3.5)</li>
+<li>scipy (&gt;=1.7.2)</li>
+<li>statsmodels (&gt;=0.12.2)</li>
+<li>matplotlib (&gt;=3.4.2)</li>
+</ul>
+<p>The required modules can be installed by navigating to the root of the cloned
+project and executing the following command:
+<code>pip install -r requirements.txt</code>. </p>
+<h2 id="examples">Examples</h2>
+<p>The example below demonstrates the workflow of using the <code><a title="samplefit" href="#samplefit">samplefit</a></code> library
+in conjunction with the well-known <code>statsmodels</code> library.</p>
+<p>Import libraries:</p>
+<pre><code class="language-python">import samplefit as sf
+import statsmodels.api as sm
+</code></pre>
+<p>Get data:</p>
+<pre><code class="language-python">boston = sm.datasets.get_rdataset(&quot;Boston&quot;, &quot;MASS&quot;)
+Y = boston.data['medv']
+X = boston.data['rm']
+X = sm.add_constant(X)
+</code></pre>
+<p>Assess model fit:</p>
+<pre><code class="language-python">model = sm.OLS(endog=Y, exog=X)
+model_fit = model.fit()
+model_fit.summary()
+</code></pre>
+<p>Assess sample fit:</p>
+<pre><code class="language-python">sample = sf.RSR(model=model)
+sample_fit = sample.fit()
+sample_fit.summary()
+</code></pre>
+<p>Assess sample reliability:</p>
+<pre><code class="language-python">sample_scores = sample.score()
+sample_scores.plot()
+</code></pre>
+<p>Assess sample sensitivity:</p>
+<pre><code class="language-python">sample_annealing = sample.anneal()
+sample_annealing.plot()
+</code></pre>
+<h2 id="authors">Authors</h2>
+<p>Gabriel Okasa &amp; Kenneth A. Younge</p>
+<h2 id="references">References</h2>
+<ul>
+<li>Okasa, Gabriel, and Kenneth A. Younge. “Random Sample Reliability.”
+Working Paper. 2022.</li>
+<li>Seabold, Skipper, and Josef Perktold. “statsmodels: Econometric and
+statistical modeling with python.” Proceedings of the 9th Python in Science
+Conference. 2010.</li>
+</ul>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+ Description
+ ----------------------------
+ A Python implementation of the Random Sample Reliability (RSR) algorithm as
+ developed in Okasa &amp; Younge (2022). The RSR estimates the reliability scores
+ for each observation within the sample. The RSR reliability scores reflect
+ the reverse of an average estimation loss resulting from a resampling
+ procedure. These scores can be further used for an annealing sensitivity
+ analysis to assess the impact of unreliable observations, or for a weighted
+ regression or a consensus estimation to reduce the impact of less reliable
+ observations.
+
+ Installation
+ ----------------------------
+ 
+ To clone the repo for the `samplefit` library run:
+
+ ```
+ git clone https://github.com/okasag/samplefit.git
+ ```
+
+ `samplefit` relies on Python 3 and requires the following dependencies:
+     
+ * numpy (&gt;=1.22.0)
+ * pandas (&gt;=1.3.5)
+ * scipy (&gt;=1.7.2)
+ * statsmodels (&gt;=0.12.2)
+ * matplotlib (&gt;=3.4.2)
+ 
+ The required modules can be installed by navigating to the root of the cloned
+ project and executing the following command:
+ `pip install -r requirements.txt`. 
+
+ Examples
+ ----------------------------
+
+ The example below demonstrates the workflow of using the `samplefit` library
+ in conjunction with the well-known `statsmodels` library.
+
+ Import libraries:
+ ```python
+ import samplefit as sf
+ import statsmodels.api as sm
+ ```
+
+ Get data:
+ ```python
+ boston = sm.datasets.get_rdataset(&#34;Boston&#34;, &#34;MASS&#34;)
+ Y = boston.data[&#39;medv&#39;]
+ X = boston.data[&#39;rm&#39;]
+ X = sm.add_constant(X)
+ ```
+
+ Assess model fit:
+ ```python
+ model = sm.OLS(endog=Y, exog=X)
+ model_fit = model.fit()
+ model_fit.summary()
+ ```
+
+ Assess sample fit:
+ ```python
+ sample = sf.RSR(model=model)
+ sample_fit = sample.fit()
+ sample_fit.summary()
+ ```
+
+ Assess sample reliability:
+ ```python
+ sample_scores = sample.score()
+ sample_scores.plot()
+ ```
+
+ Assess sample sensitivity:
+ ```python
+ sample_annealing = sample.anneal()
+ sample_annealing.plot()
+ ```
+
+ Authors
+ ----------------------------
+ Gabriel Okasa &amp; Kenneth A. Younge
+
+ References
+ ----------------------------
+ - Okasa, Gabriel, and Kenneth A. Younge. “Random Sample Reliability.”
+ Working Paper. 2022.
+ - Seabold, Skipper, and Josef Perktold. “statsmodels: Econometric and 
+ statistical modeling with python.” Proceedings of the 9th Python in Science 
+ Conference. 2010.
+&#34;&#34;&#34;
+
+from samplefit.Reliability import RSR
+from samplefit.Reliability import RSRFitResults
+from samplefit.Reliability import RSRAnnealResults
+from samplefit.Reliability import RSRScoreResults
+
+__all__ = [&#34;RSR&#34;, &#34;RSRFitResults&#34;, &#34;RSRAnnealResults&#34;, &#34;RSRScoreResults&#34;]
+__version__ = &#34;0.0.9000&#34;
+__module__ = &#39;samplefit&#39;
+__author__ = &#34;Gabriel Okasa &amp; Kenneth A. Younge&#34;
+__copyright__ = &#34;Copyright (c) 2022, Gabriel Okasa &amp; Kenneth A. Younge&#34;
+__license__ = &#34;MIT License&#34;</code></pre>
+</details>
+</section>
+<section>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+<dl>
+<dt><code class="name"><a title="samplefit.Reliability" href="Reliability.html">samplefit.Reliability</a></code></dt>
+<dd>
+<div class="desc"><p>samplefit: Random Sample Reliability …</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="samplefit.RSR"><code class="flex name class">
+<span>class <span class="ident">RSR</span></span>
+<span>(</span><span>linear_model=None, n_samples=1000, min_samples=None, loss=None, boost=None, n_jobs=-1, random_state=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Random Sample Reliability class labeled <code><a title="samplefit.RSR" href="#samplefit.RSR">RSR</a></code>. Initializes
+parameters for sample fit.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>linear_model</code></strong> :&ensp;<code>statsmodels class</code></dt>
+<dd>Linear model specified via statsmodels OLS or GLM class.</dd>
+<dt><strong><code>n_samples</code></strong> :&ensp;<code>int</code></dt>
+<dd>The number of samples in the sub-sampling. The default is 1000.</dd>
+<dt><strong><code>min_samples</code></strong> :&ensp;<code>int, float</code> or <code>NoneType</code></dt>
+<dd>Minimum number of observations for each subsample, i.e. number of
+observations to draw from the data without replacement. If integer
+supplied, exact number of observation is sampeld. If float, share of
+full sample is considered (rounded up). If None, the minimum number of
+observations to estimate the model is selected, i.e p+1, where p is
+number of model parameters. The default is None.</dd>
+<dt><strong><code>loss</code></strong> :&ensp;<code>str</code> or <code>lambda function</code></dt>
+<dd>Loss function for evaluation of the estimation errors. Loss must be
+either 'squared_error' or 'absolute_error'. For a user defined loss
+function, user can directly supply own lambda function of type:
+'lambda y, yhat:'. Default is 'absolute_error'.</dd>
+<dt><strong><code>boost</code></strong> :&ensp;<code>float</code> or <code>NoneType</code></dt>
+<dd>Share of sample that should be boosted, i.e. the share of observations
+that is sequentially dropped from the sample based on the iteratively
+lowest reliability scores. The final boosted reliability scores are
+then estimated based on the boosted sample that excludes boost \% of
+the most unreliable observations from the sample. Boosting should be
+applied only when there is a prior knowledge of the outlier share.
+The default is None.</dd>
+<dt><strong><code>n_jobs</code></strong> :&ensp;<code>int</code> or <code>NoneType</code></dt>
+<dd>
+<p>The number of parallel jobs to be used for multithreading in
+<a href="#samplefit.Reliability.RSR.fit"><code>.fit()</code></a>,
+<a href="#samplefit.Reliability.RSR.score"><code>.score()</code></a> and
+<a href="#samplefit.Reliability.RSR.anneal"><code>.anneal()</code></a>.
+Follows
+<a href="https://joblib.readthedocs.io" target="_blank"><code>joblib</code></a> semantics:</p>
+<ul>
+<li><code>n_jobs=-1</code> means all - 1 available cpu cores.</li>
+<li><code>n_jobs=None</code> and <code>n_jobs=1</code> means no parallelism.</li>
+</ul>
+<p>The default is -1.</p>
+</dd>
+<dt><strong><code>random_state</code></strong> :&ensp;<code>int, None</code> or <code>numpy.random.RandomState object</code></dt>
+<dd>Random seed used to initialize the pseudo-random number
+generator. See
+<a href="https://numpy.org/doc/stable/reference/random/legacy.html" target="_blank"><code>numpy</code> documentation</a>
+for details. The default is None.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Initializes RSR class. Following methods are available:</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<p>.fit(), .score() and .anneal().</p>
+<h2 id="notes">Notes</h2>
+<p><code><a title="samplefit.RSR" href="#samplefit.RSR">RSR</a></code> includes methods to <a href="#samplefit.Reliability.RSR.fit"><code>.fit()</code></a>,
+<a href="#samplefit.Reliability.RSR.score"><code>.score()</code></a> and
+<a href="#samplefit.Reliability.RSR.anneal"><code>.anneal()</code></a>.</p>
+<p>For further details, see examples below.</p>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-py"># import libraries
+import samplefit as sf
+import statsmodels.api as sm
+
+# get data 
+boston = sm.datasets.get_rdataset(&quot;Boston&quot;, &quot;MASS&quot;)
+Y = boston.data['medv'] # median house price
+X = boston.data['rm'] # number of rooms
+X = sm.add_constant(X)
+
+# assess model fit
+model = sm.OLS(endog=Y, exog=X)
+model_fit = model.fit()
+model_fit.summary()
+
+# assess sample fit
+sample = sf.RSR(linear_model=model)
+sample_fit = sample.fit()
+sample_fit.summary()
+
+# assess sample sensitivity
+sample_annealing = sample.anneal()
+sample_annealing.plot()
+
+# assess sample reliability
+sample_scores = sample.score()
+sample_scores.plot()
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class RSR(BaseRSR):
+    &#34;&#34;&#34;
+    Random Sample Reliability class labeled `RSR()`. Initializes
+    parameters for sample fit.
+
+    Parameters
+    ----------
+    linear_model : statsmodels class
+        Linear model specified via statsmodels OLS or GLM class.
+    n_samples : int
+        The number of samples in the sub-sampling. The default is 1000.
+    min_samples : int, float or NoneType
+        Minimum number of observations for each subsample, i.e. number of
+        observations to draw from the data without replacement. If integer
+        supplied, exact number of observation is sampeld. If float, share of
+        full sample is considered (rounded up). If None, the minimum number of
+        observations to estimate the model is selected, i.e p+1, where p is
+        number of model parameters. The default is None.
+    loss : str or lambda function
+        Loss function for evaluation of the estimation errors. Loss must be
+        either &#39;squared_error&#39; or &#39;absolute_error&#39;. For a user defined loss
+        function, user can directly supply own lambda function of type:
+        &#39;lambda y, yhat:&#39;. Default is &#39;absolute_error&#39;.
+    boost : float or NoneType
+        Share of sample that should be boosted, i.e. the share of observations
+        that is sequentially dropped from the sample based on the iteratively
+        lowest reliability scores. The final boosted reliability scores are
+        then estimated based on the boosted sample that excludes boost \% of
+        the most unreliable observations from the sample. Boosting should be
+        applied only when there is a prior knowledge of the outlier share.
+        The default is None.
+    n_jobs : int or NoneType
+        The number of parallel jobs to be used for multithreading in
+        [`.fit()`](#samplefit.Reliability.RSR.fit),
+        [`.score()`](#samplefit.Reliability.RSR.score) and
+        [`.anneal()`](#samplefit.Reliability.RSR.anneal).
+        Follows
+        [`joblib`](https://joblib.readthedocs.io){:target=&#34;_blank&#34;} semantics:
+
+        - `n_jobs=-1` means all - 1 available cpu cores.
+        - `n_jobs=None` and `n_jobs=1` means no parallelism.
+
+        The default is -1.
+    random_state : int, None or numpy.random.RandomState object
+        Random seed used to initialize the pseudo-random number
+        generator. See
+        [`numpy` documentation](https://numpy.org/doc/stable/reference/random/legacy.html){:target=&#34;_blank&#34;}
+        for details. The default is None.
+
+    Returns
+    -------
+    Initializes RSR class. Following methods are available:
+    .fit(), .score() and .anneal().
+
+
+    Notes
+    -----
+    `RSR()` includes methods to [`.fit()`](#samplefit.Reliability.RSR.fit),
+    [`.score()`](#samplefit.Reliability.RSR.score) and
+    [`.anneal()`](#samplefit.Reliability.RSR.anneal).
+
+    For further details, see examples below.
+
+    Examples
+    --------
+    ```py
+    # import libraries
+    import samplefit as sf
+    import statsmodels.api as sm
+    
+    # get data 
+    boston = sm.datasets.get_rdataset(&#34;Boston&#34;, &#34;MASS&#34;)
+    Y = boston.data[&#39;medv&#39;] # median house price
+    X = boston.data[&#39;rm&#39;] # number of rooms
+    X = sm.add_constant(X)
+    
+    # assess model fit
+    model = sm.OLS(endog=Y, exog=X)
+    model_fit = model.fit()
+    model_fit.summary()
+    
+    # assess sample fit
+    sample = sf.RSR(linear_model=model)
+    sample_fit = sample.fit()
+    sample_fit.summary()
+    
+    # assess sample sensitivity
+    sample_annealing = sample.anneal()
+    sample_annealing.plot()
+    
+    # assess sample reliability
+    sample_scores = sample.score()
+    sample_scores.plot()
+    ```
+    &#34;&#34;&#34;
+
+    # define init function
+    def __init__(self,
+                 linear_model=None,
+                 n_samples=1000,
+                 min_samples=None,
+                 loss=None,
+                 boost=None,
+                 n_jobs=-1,
+                 random_state=None):
+        # access inherited methods
+        super().__init__(
+            linear_model=linear_model,
+            n_samples=n_samples,
+            min_samples=min_samples,
+            loss=loss,
+            boost=boost,
+            n_jobs=n_jobs,
+            random_state=random_state
+        )
+
+
+    def fit(self,
+            weights=None,
+            consensus=None,
+            n_boot=None):
+        &#34;&#34;&#34;
+        Sample fit based on the reliability scores via the RSR algorithm.
+
+        Parameters
+        ----------
+        weights : array-like of shape (n_obs, 1) or NoneType
+            An array of weights for weighted regression. If None, squared
+            reliability scores will be used as weights as a default. Note, that
+            if bootstrapping is used for inference, the estimation of
+            user-supplied weights is not reflected. Default is None.
+        consensus : str or NoneType
+            Type of optimization for consensus fit. Currently only
+            &#39;second_derivative&#39; is supported. If None, weighted fit is
+            performed. For consensus fit, set consensus=&#39;second_derivative&#39; and
+            weights=None. In all other cases, weighted fit is performed.
+            Default is None.
+        n_boot : int or NoneType
+            Number of bootstrap replications for inference. If None specified,
+            asymptotic approximation is used for inference instead. For valid
+            inference, bootstrapping is recommended. Note that bootstrapping
+            requires longer computation time. Default is None.
+
+        Returns
+        -------
+        Results of class RSRFitResults. Following methods are available:
+        .summary(), .conf_int() and .predict().
+
+        Notes
+        -----
+        [`.fit()`](#samplefit.Reliability.RSR.fit) estimates the reliability
+        scores via the RSR algorithm in the first step and estimates weighted
+        regression in the second step, with the reliability scores as weights
+        if not specified otherwise.
+
+        Examples
+        --------
+        ```py
+        # import libraries
+        import samplefit as sf
+        import statsmodels.api as sm
+        
+        # get data 
+        boston = sm.datasets.get_rdataset(&#34;Boston&#34;, &#34;MASS&#34;)
+        Y = boston.data[&#39;medv&#39;] # median house price
+        X = boston.data[&#39;rm&#39;] # number of rooms
+        X = sm.add_constant(X)
+        
+        # specify model
+        model = sm.OLS(endog=Y, exog=X)
+        
+        # specify sample
+        sample = sf.RSR(linear_model=model)
+        
+        # sample fit with defaults
+        sample_fit = sample.fit()
+        
+        # sample fit with consensus
+        sample_fit = sample.fit(consensus=&#39;second_derivative&#39;)
+        
+        # sample fit with bootstrapping
+        sample_fit = sample.fit(n_boot=1000)
+        
+        # get summary of sample fit
+        sample_fit.summary()
+        
+        # get confidence intervals
+        ci_low, ci_up = sample_fit.conf_int()
+        
+        # get predictions (in-sample)
+        preds = sample_fit.predict()
+        ```
+        &#34;&#34;&#34;
+        return super().fit(
+            weights=weights,
+            consensus=consensus,
+            n_boot=n_boot
+            )
+
+
+    def score(self):
+        &#34;&#34;&#34;
+        Estimation of reliability scores via the RSR algorithm.
+
+        Parameters
+        ----------
+        None.
+
+        Returns
+        -------
+        Results of class RSRScoreResults. Following methods are available:
+        .plot().
+
+        Notes
+        -----
+        [`.score()`](#samplefit.Reliability.RSR.score) estimates the
+        reliability scores via the RSR algorithm. Each observation is scored
+        for the reliability with 0 being the most unreliable observation and
+        with 1 being the most reliable observation within a sample.
+
+        Examples
+        --------
+        ```py
+        # import libraries
+        import samplefit as sf
+        import statsmodels.api as sm
+        
+        # get data 
+        boston = sm.datasets.get_rdataset(&#34;Boston&#34;, &#34;MASS&#34;)
+        Y = boston.data[&#39;medv&#39;] # median house price
+        X = boston.data[&#39;rm&#39;] # number of rooms
+        X = sm.add_constant(X)
+        
+        # specify model
+        model = sm.OLS(endog=Y, exog=X)
+        
+        # specify sample
+        sample = sf.RSR(linear_model=model)
+        
+        # score reliability
+        sample_scores = sample.score()
+        
+        # extract reliability scores
+        scores = sample_scores.scores
+        
+        # plot reliability scores
+        sample_scores.plot()
+        ```
+        &#34;&#34;&#34;
+        return super().score()
+
+
+    def anneal(self, share=0.05, n_boot=None):
+        &#34;&#34;&#34;
+        Sample annealing based on the reliability scores via the RSR algorithm.
+
+        Parameters
+        ----------
+        share : float or NoneType
+            Share of sample that gets annealed based on the most unreliable
+            observations. Default is 0.05.
+        n_boot : int or NoneType
+            Number of bootstrap replications for inference. If None specified,
+            asymptotic approximation is used for inference instead. For valid
+            inference, bootstrapping is recommended. Note that bootstrapping
+            requires longer computation time. Default is None.
+
+        Returns
+        -------
+        Results of class RSRAnnealResults. Following methods are available:
+        .conf_int() and .plot().
+
+        Notes
+        -----
+        [`.anneal()`](#samplefit.Reliability.RSR.anneal) re-estimates the model
+        while sequentially dropping the most unreliable observations. Such
+        annealing procedure helps to assess the sample sensitivity and detect
+        how much the parameters depend on particularly unreliable observations.
+
+        Examples
+        --------
+        ```py
+        # import libraries
+        import samplefit as sf
+        import statsmodels.api as sm
+        
+        # get data 
+        boston = sm.datasets.get_rdataset(&#34;Boston&#34;, &#34;MASS&#34;)
+        Y = boston.data[&#39;medv&#39;] # median house price
+        X = boston.data[&#39;rm&#39;] # number of rooms
+        X = sm.add_constant(X)
+        
+        # specify model
+        model = sm.OLS(endog=Y, exog=X)
+        
+        # specify sample
+        sample = sf.RSR(linear_model=model)
+        
+        # sample annealing with defaults
+        sample_annealing = sample.anneal()
+        
+        # sample annealing with specified share
+        sample_annealing = sample.anneal(share=0.1)
+        
+        # sample annealing with bootstrapping
+        sample_annealing = sample.anneal(n_boot=1000)
+        
+        # get confidence intervals
+        ci_low, ci_up = sample_annealing.conf_int()
+        
+        # get annealing plot
+        sample_annealing.plot()
+        ```
+        &#34;&#34;&#34;
+        return super().anneal(
+            share=share,
+            n_boot=n_boot
+            )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>samplefit._BaseReliability.BaseRSR</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="samplefit.RSR.anneal"><code class="name flex">
+<span>def <span class="ident">anneal</span></span>(<span>self, share=0.05, n_boot=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Sample annealing based on the reliability scores via the RSR algorithm.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>share</code></strong> :&ensp;<code>float</code> or <code>NoneType</code></dt>
+<dd>Share of sample that gets annealed based on the most unreliable
+observations. Default is 0.05.</dd>
+<dt><strong><code>n_boot</code></strong> :&ensp;<code>int</code> or <code>NoneType</code></dt>
+<dd>Number of bootstrap replications for inference. If None specified,
+asymptotic approximation is used for inference instead. For valid
+inference, bootstrapping is recommended. Note that bootstrapping
+requires longer computation time. Default is None.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Results</code> of <code>class RSRAnnealResults. Following methods are available:</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<p>.conf_int() and .plot().</p>
+<h2 id="notes">Notes</h2>
+<p><a href="#samplefit.Reliability.RSR.anneal"><code>.anneal()</code></a> re-estimates the model
+while sequentially dropping the most unreliable observations. Such
+annealing procedure helps to assess the sample sensitivity and detect
+how much the parameters depend on particularly unreliable observations.</p>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-py"># import libraries
+import samplefit as sf
+import statsmodels.api as sm
+
+# get data 
+boston = sm.datasets.get_rdataset(&quot;Boston&quot;, &quot;MASS&quot;)
+Y = boston.data['medv'] # median house price
+X = boston.data['rm'] # number of rooms
+X = sm.add_constant(X)
+
+# specify model
+model = sm.OLS(endog=Y, exog=X)
+
+# specify sample
+sample = sf.RSR(linear_model=model)
+
+# sample annealing with defaults
+sample_annealing = sample.anneal()
+
+# sample annealing with specified share
+sample_annealing = sample.anneal(share=0.1)
+
+# sample annealing with bootstrapping
+sample_annealing = sample.anneal(n_boot=1000)
+
+# get confidence intervals
+ci_low, ci_up = sample_annealing.conf_int()
+
+# get annealing plot
+sample_annealing.plot()
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def anneal(self, share=0.05, n_boot=None):
+    &#34;&#34;&#34;
+    Sample annealing based on the reliability scores via the RSR algorithm.
+
+    Parameters
+    ----------
+    share : float or NoneType
+        Share of sample that gets annealed based on the most unreliable
+        observations. Default is 0.05.
+    n_boot : int or NoneType
+        Number of bootstrap replications for inference. If None specified,
+        asymptotic approximation is used for inference instead. For valid
+        inference, bootstrapping is recommended. Note that bootstrapping
+        requires longer computation time. Default is None.
+
+    Returns
+    -------
+    Results of class RSRAnnealResults. Following methods are available:
+    .conf_int() and .plot().
+
+    Notes
+    -----
+    [`.anneal()`](#samplefit.Reliability.RSR.anneal) re-estimates the model
+    while sequentially dropping the most unreliable observations. Such
+    annealing procedure helps to assess the sample sensitivity and detect
+    how much the parameters depend on particularly unreliable observations.
+
+    Examples
+    --------
+    ```py
+    # import libraries
+    import samplefit as sf
+    import statsmodels.api as sm
+    
+    # get data 
+    boston = sm.datasets.get_rdataset(&#34;Boston&#34;, &#34;MASS&#34;)
+    Y = boston.data[&#39;medv&#39;] # median house price
+    X = boston.data[&#39;rm&#39;] # number of rooms
+    X = sm.add_constant(X)
+    
+    # specify model
+    model = sm.OLS(endog=Y, exog=X)
+    
+    # specify sample
+    sample = sf.RSR(linear_model=model)
+    
+    # sample annealing with defaults
+    sample_annealing = sample.anneal()
+    
+    # sample annealing with specified share
+    sample_annealing = sample.anneal(share=0.1)
+    
+    # sample annealing with bootstrapping
+    sample_annealing = sample.anneal(n_boot=1000)
+    
+    # get confidence intervals
+    ci_low, ci_up = sample_annealing.conf_int()
+    
+    # get annealing plot
+    sample_annealing.plot()
+    ```
+    &#34;&#34;&#34;
+    return super().anneal(
+        share=share,
+        n_boot=n_boot
+        )</code></pre>
+</details>
+</dd>
+<dt id="samplefit.RSR.fit"><code class="name flex">
+<span>def <span class="ident">fit</span></span>(<span>self, weights=None, consensus=None, n_boot=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Sample fit based on the reliability scores via the RSR algorithm.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>weights</code></strong> :&ensp;<code>array-like</code> of <code>shape (n_obs, 1)</code> or <code>NoneType</code></dt>
+<dd>An array of weights for weighted regression. If None, squared
+reliability scores will be used as weights as a default. Note, that
+if bootstrapping is used for inference, the estimation of
+user-supplied weights is not reflected. Default is None.</dd>
+<dt><strong><code>consensus</code></strong> :&ensp;<code>str</code> or <code>NoneType</code></dt>
+<dd>Type of optimization for consensus fit. Currently only
+'second_derivative' is supported. If None, weighted fit is
+performed. For consensus fit, set consensus='second_derivative' and
+weights=None. In all other cases, weighted fit is performed.
+Default is None.</dd>
+<dt><strong><code>n_boot</code></strong> :&ensp;<code>int</code> or <code>NoneType</code></dt>
+<dd>Number of bootstrap replications for inference. If None specified,
+asymptotic approximation is used for inference instead. For valid
+inference, bootstrapping is recommended. Note that bootstrapping
+requires longer computation time. Default is None.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Results</code> of <code>class RSRFitResults. Following methods are available:</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<p>.summary(), .conf_int() and .predict().</p>
+<h2 id="notes">Notes</h2>
+<p><a href="#samplefit.Reliability.RSR.fit"><code>.fit()</code></a> estimates the reliability
+scores via the RSR algorithm in the first step and estimates weighted
+regression in the second step, with the reliability scores as weights
+if not specified otherwise.</p>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-py"># import libraries
+import samplefit as sf
+import statsmodels.api as sm
+
+# get data 
+boston = sm.datasets.get_rdataset(&quot;Boston&quot;, &quot;MASS&quot;)
+Y = boston.data['medv'] # median house price
+X = boston.data['rm'] # number of rooms
+X = sm.add_constant(X)
+
+# specify model
+model = sm.OLS(endog=Y, exog=X)
+
+# specify sample
+sample = sf.RSR(linear_model=model)
+
+# sample fit with defaults
+sample_fit = sample.fit()
+
+# sample fit with consensus
+sample_fit = sample.fit(consensus='second_derivative')
+
+# sample fit with bootstrapping
+sample_fit = sample.fit(n_boot=1000)
+
+# get summary of sample fit
+sample_fit.summary()
+
+# get confidence intervals
+ci_low, ci_up = sample_fit.conf_int()
+
+# get predictions (in-sample)
+preds = sample_fit.predict()
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def fit(self,
+        weights=None,
+        consensus=None,
+        n_boot=None):
+    &#34;&#34;&#34;
+    Sample fit based on the reliability scores via the RSR algorithm.
+
+    Parameters
+    ----------
+    weights : array-like of shape (n_obs, 1) or NoneType
+        An array of weights for weighted regression. If None, squared
+        reliability scores will be used as weights as a default. Note, that
+        if bootstrapping is used for inference, the estimation of
+        user-supplied weights is not reflected. Default is None.
+    consensus : str or NoneType
+        Type of optimization for consensus fit. Currently only
+        &#39;second_derivative&#39; is supported. If None, weighted fit is
+        performed. For consensus fit, set consensus=&#39;second_derivative&#39; and
+        weights=None. In all other cases, weighted fit is performed.
+        Default is None.
+    n_boot : int or NoneType
+        Number of bootstrap replications for inference. If None specified,
+        asymptotic approximation is used for inference instead. For valid
+        inference, bootstrapping is recommended. Note that bootstrapping
+        requires longer computation time. Default is None.
+
+    Returns
+    -------
+    Results of class RSRFitResults. Following methods are available:
+    .summary(), .conf_int() and .predict().
+
+    Notes
+    -----
+    [`.fit()`](#samplefit.Reliability.RSR.fit) estimates the reliability
+    scores via the RSR algorithm in the first step and estimates weighted
+    regression in the second step, with the reliability scores as weights
+    if not specified otherwise.
+
+    Examples
+    --------
+    ```py
+    # import libraries
+    import samplefit as sf
+    import statsmodels.api as sm
+    
+    # get data 
+    boston = sm.datasets.get_rdataset(&#34;Boston&#34;, &#34;MASS&#34;)
+    Y = boston.data[&#39;medv&#39;] # median house price
+    X = boston.data[&#39;rm&#39;] # number of rooms
+    X = sm.add_constant(X)
+    
+    # specify model
+    model = sm.OLS(endog=Y, exog=X)
+    
+    # specify sample
+    sample = sf.RSR(linear_model=model)
+    
+    # sample fit with defaults
+    sample_fit = sample.fit()
+    
+    # sample fit with consensus
+    sample_fit = sample.fit(consensus=&#39;second_derivative&#39;)
+    
+    # sample fit with bootstrapping
+    sample_fit = sample.fit(n_boot=1000)
+    
+    # get summary of sample fit
+    sample_fit.summary()
+    
+    # get confidence intervals
+    ci_low, ci_up = sample_fit.conf_int()
+    
+    # get predictions (in-sample)
+    preds = sample_fit.predict()
+    ```
+    &#34;&#34;&#34;
+    return super().fit(
+        weights=weights,
+        consensus=consensus,
+        n_boot=n_boot
+        )</code></pre>
+</details>
+</dd>
+<dt id="samplefit.RSR.score"><code class="name flex">
+<span>def <span class="ident">score</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Estimation of reliability scores via the RSR algorithm.</p>
+<h2 id="parameters">Parameters</h2>
+<p>None.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Results</code> of <code>class RSRScoreResults. Following methods are available:</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<p>.plot().</p>
+<h2 id="notes">Notes</h2>
+<p><a href="#samplefit.Reliability.RSR.score"><code>.score()</code></a> estimates the
+reliability scores via the RSR algorithm. Each observation is scored
+for the reliability with 0 being the most unreliable observation and
+with 1 being the most reliable observation within a sample.</p>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-py"># import libraries
+import samplefit as sf
+import statsmodels.api as sm
+
+# get data 
+boston = sm.datasets.get_rdataset(&quot;Boston&quot;, &quot;MASS&quot;)
+Y = boston.data['medv'] # median house price
+X = boston.data['rm'] # number of rooms
+X = sm.add_constant(X)
+
+# specify model
+model = sm.OLS(endog=Y, exog=X)
+
+# specify sample
+sample = sf.RSR(linear_model=model)
+
+# score reliability
+sample_scores = sample.score()
+
+# extract reliability scores
+scores = sample_scores.scores
+
+# plot reliability scores
+sample_scores.plot()
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def score(self):
+    &#34;&#34;&#34;
+    Estimation of reliability scores via the RSR algorithm.
+
+    Parameters
+    ----------
+    None.
+
+    Returns
+    -------
+    Results of class RSRScoreResults. Following methods are available:
+    .plot().
+
+    Notes
+    -----
+    [`.score()`](#samplefit.Reliability.RSR.score) estimates the
+    reliability scores via the RSR algorithm. Each observation is scored
+    for the reliability with 0 being the most unreliable observation and
+    with 1 being the most reliable observation within a sample.
+
+    Examples
+    --------
+    ```py
+    # import libraries
+    import samplefit as sf
+    import statsmodels.api as sm
+    
+    # get data 
+    boston = sm.datasets.get_rdataset(&#34;Boston&#34;, &#34;MASS&#34;)
+    Y = boston.data[&#39;medv&#39;] # median house price
+    X = boston.data[&#39;rm&#39;] # number of rooms
+    X = sm.add_constant(X)
+    
+    # specify model
+    model = sm.OLS(endog=Y, exog=X)
+    
+    # specify sample
+    sample = sf.RSR(linear_model=model)
+    
+    # score reliability
+    sample_scores = sample.score()
+    
+    # extract reliability scores
+    scores = sample_scores.scores
+    
+    # plot reliability scores
+    sample_scores.plot()
+    ```
+    &#34;&#34;&#34;
+    return super().score()</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="samplefit.RSRAnnealResults"><code class="flex name class">
+<span>class <span class="ident">RSRAnnealResults</span></span>
+<span>(</span><span>sample=None, params=None, params_boot=None, stand_err=None, drop_idx=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Reliability Results class labeled <code><a title="samplefit.RSRAnnealResults" href="#samplefit.RSRAnnealResults">RSRAnnealResults</a></code>.
+Initializes output of RSR.anneal().</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class RSRAnnealResults(BaseRSRAnnealResults):
+    &#34;&#34;&#34;
+    Reliability Results class labeled `RSRAnnealResults()`.
+    Initializes output of RSR.anneal().
+
+    &#34;&#34;&#34;
+
+    # define init function
+    def __init__(self,
+                 sample=None,
+                 params=None,
+                 params_boot=None,
+                 stand_err=None,
+                 drop_idx=None
+                 ):
+        # access inherited methods
+        super().__init__(
+            sample=sample,
+            params=params,
+            params_boot=params_boot,
+            stand_err=stand_err,
+            drop_idx=drop_idx
+        )
+
+
+    def plot(self,
+             xname=None,
+             title=None,
+             alpha=0.05,
+             percentile=False,
+             color=None,
+             path=None,
+             figsize=None,
+             ylim=None,
+             xlabel=None,
+             dpi=None):
+        &#34;&#34;&#34;
+        Plot the Annealing based on the reliability scores via the RSR
+        of class `Sample()`.
+        
+        Parameters
+        ----------
+        xname : list, tuple, str or NoneType
+            Name or list of names of the exog variables for which parameter
+            an annealing plot should be constructed. Must be one of the exog 
+            variable names. If not supplied annealing plots for all parameters
+            are constructed. Default are the supplied exog names.
+        title : str or NoneType
+            Title for the annealing plot. Default is
+            &#39;RSR: Annealing Sensitivity&#39;.
+        alpha : float or NoneType
+            Confidence level alpha. Default is 0.05.
+        percentile : bool
+            Percentile method for confidence intervals based on bootstrapping.
+            If bootstrapping has not been used for annealing, it is ignored.
+            Default is False.
+        color : str or NoneType
+            Color used for the confidence interval. Must be one of the
+            matplotlib supported colors. Default is grey.
+        path : str or NoneType
+            Valid path to save the plot. If None, plot is not saved. Default
+            is None.
+        figsize : tuple or NoneType
+            Tuple of x and y axis size for matplotlib figsize argument.
+            Default is (10,5).
+        ylim : tuple, list or NoneType
+            Tuple of upper and lower limits of y axis. Default is automatic.
+        xlabel : str or NoneType
+            Label for the x axis for the exog variable. Default is &#39;xname&#39;.
+        dpi : float, int or NoneType
+            The resolution for matplotlib scatter plot. Default is 100.
+            
+
+        Returns
+        -------
+        Dictionary of matplotlib figures. Prints annealing plots.
+
+        Notes
+        -----
+        [`.plot()`](#samplefit.Reliability.RSRAnnealResults.plot) produces
+        an annealing plot for assessment of sample fit sensitivity, together
+        with parameters and confidence intervals.
+
+        Examples
+        --------
+        ```py
+        # import libraries
+        import samplefit as sf
+        import statsmodels.api as sm
+        
+        # get data 
+        boston = sm.datasets.get_rdataset(&#34;Boston&#34;, &#34;MASS&#34;)
+        Y = boston.data[&#39;medv&#39;] # median house price
+        X = boston.data[&#39;rm&#39;] # number of rooms
+        X = sm.add_constant(X)
+        
+        # specify model
+        model = sm.OLS(endog=Y, exog=X)
+        
+        # specify sample
+        sample = sf.RSR(linear_model=model)
+        
+        # sample annealing
+        sample_annealing = sample.anneal()
+        
+        # default annealing plot
+        sample_annealing.plot()
+        
+        # custom annealing
+        sample_annealing.plot(title=&#39;My Title&#39;)
+        ```
+        &#34;&#34;&#34;
+        return super().plot(
+            xname=xname,
+            title=title,
+            alpha=alpha,
+            percentile=percentile,
+            color=color,
+            path=path,
+            figsize=figsize,
+            ylim=ylim,
+            xlabel=xlabel,
+            dpi=dpi
+            )
+    
+    
+    def conf_int(self,
+                 alpha=0.05,
+                 percentile=False):
+        &#34;&#34;&#34;
+        Fitting the model based on the reliability scores via the RSR algorithm
+        of class `Sample()`.
+        
+        Parameters
+        ----------
+        alpha : float or NoneType
+            Confidence level alpha. Default is 0.05.
+        percentile : bool
+            Percentile method for confidence intervals based on bootstrapping.
+            If bootstrapping has not been used for fitting, it is ignored.
+            Default is False.
+
+        Returns
+        -------
+        Tuple of arrays of confidence bounds, lower and upper.
+
+        Notes
+        -----
+        [`.conf_int()`](#samplefit.Reliability.RSRAnnealResults.conf_int)
+        constructs confidence intervals for estimated paramaters. If annealed
+        without bootstrapping, asymptotic approximations are used. If annealed
+        with bootstrapping, the standard deviation of bootstrapped parameters
+        is used for standard error approximation. If percentile=True, the
+        percentile method is used instead of standard deviation.
+
+        Examples
+        --------
+        ```py
+        # import libraries
+        import samplefit as sf
+        import statsmodels.api as sm
+        
+        # get data 
+        boston = sm.datasets.get_rdataset(&#34;Boston&#34;, &#34;MASS&#34;)
+        Y = boston.data[&#39;medv&#39;] # median house price
+        X = boston.data[&#39;rm&#39;] # number of rooms
+        X = sm.add_constant(X)
+        
+        # specify model
+        model = sm.OLS(endog=Y, exog=X)
+        
+        # specify sample
+        sample = sf.RSR(linear_model=model)
+        
+        # sample annealing
+        sample_annealing = sample.anneal()
+        
+        # compute confidence intervals with default settings
+        ci_low, ci_up = sample_annealing.conf_int()
+        
+        # compute confidence intervals with custom alpha
+        ci_low, ci_up = sample_fit.conf_int(alpha=0.1)
+        ```
+        &#34;&#34;&#34;
+        return super().conf_int(
+            alpha=alpha,
+            percentile=percentile
+            )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>samplefit._BaseResultsReliability.BaseRSRAnnealResults</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="samplefit.RSRAnnealResults.conf_int"><code class="name flex">
+<span>def <span class="ident">conf_int</span></span>(<span>self, alpha=0.05, percentile=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fitting the model based on the reliability scores via the RSR algorithm
+of class <code>Sample()</code>.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>alpha</code></strong> :&ensp;<code>float</code> or <code>NoneType</code></dt>
+<dd>Confidence level alpha. Default is 0.05.</dd>
+<dt><strong><code>percentile</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Percentile method for confidence intervals based on bootstrapping.
+If bootstrapping has not been used for fitting, it is ignored.
+Default is False.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Tuple of arrays of confidence bounds, lower and upper.</p>
+<h2 id="notes">Notes</h2>
+<p><a href="#samplefit.Reliability.RSRAnnealResults.conf_int"><code>.conf_int()</code></a>
+constructs confidence intervals for estimated paramaters. If annealed
+without bootstrapping, asymptotic approximations are used. If annealed
+with bootstrapping, the standard deviation of bootstrapped parameters
+is used for standard error approximation. If percentile=True, the
+percentile method is used instead of standard deviation.</p>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-py"># import libraries
+import samplefit as sf
+import statsmodels.api as sm
+
+# get data 
+boston = sm.datasets.get_rdataset(&quot;Boston&quot;, &quot;MASS&quot;)
+Y = boston.data['medv'] # median house price
+X = boston.data['rm'] # number of rooms
+X = sm.add_constant(X)
+
+# specify model
+model = sm.OLS(endog=Y, exog=X)
+
+# specify sample
+sample = sf.RSR(linear_model=model)
+
+# sample annealing
+sample_annealing = sample.anneal()
+
+# compute confidence intervals with default settings
+ci_low, ci_up = sample_annealing.conf_int()
+
+# compute confidence intervals with custom alpha
+ci_low, ci_up = sample_fit.conf_int(alpha=0.1)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def conf_int(self,
+             alpha=0.05,
+             percentile=False):
+    &#34;&#34;&#34;
+    Fitting the model based on the reliability scores via the RSR algorithm
+    of class `Sample()`.
+    
+    Parameters
+    ----------
+    alpha : float or NoneType
+        Confidence level alpha. Default is 0.05.
+    percentile : bool
+        Percentile method for confidence intervals based on bootstrapping.
+        If bootstrapping has not been used for fitting, it is ignored.
+        Default is False.
+
+    Returns
+    -------
+    Tuple of arrays of confidence bounds, lower and upper.
+
+    Notes
+    -----
+    [`.conf_int()`](#samplefit.Reliability.RSRAnnealResults.conf_int)
+    constructs confidence intervals for estimated paramaters. If annealed
+    without bootstrapping, asymptotic approximations are used. If annealed
+    with bootstrapping, the standard deviation of bootstrapped parameters
+    is used for standard error approximation. If percentile=True, the
+    percentile method is used instead of standard deviation.
+
+    Examples
+    --------
+    ```py
+    # import libraries
+    import samplefit as sf
+    import statsmodels.api as sm
+    
+    # get data 
+    boston = sm.datasets.get_rdataset(&#34;Boston&#34;, &#34;MASS&#34;)
+    Y = boston.data[&#39;medv&#39;] # median house price
+    X = boston.data[&#39;rm&#39;] # number of rooms
+    X = sm.add_constant(X)
+    
+    # specify model
+    model = sm.OLS(endog=Y, exog=X)
+    
+    # specify sample
+    sample = sf.RSR(linear_model=model)
+    
+    # sample annealing
+    sample_annealing = sample.anneal()
+    
+    # compute confidence intervals with default settings
+    ci_low, ci_up = sample_annealing.conf_int()
+    
+    # compute confidence intervals with custom alpha
+    ci_low, ci_up = sample_fit.conf_int(alpha=0.1)
+    ```
+    &#34;&#34;&#34;
+    return super().conf_int(
+        alpha=alpha,
+        percentile=percentile
+        )</code></pre>
+</details>
+</dd>
+<dt id="samplefit.RSRAnnealResults.plot"><code class="name flex">
+<span>def <span class="ident">plot</span></span>(<span>self, xname=None, title=None, alpha=0.05, percentile=False, color=None, path=None, figsize=None, ylim=None, xlabel=None, dpi=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Plot the Annealing based on the reliability scores via the RSR
+of class <code>Sample()</code>.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>xname</code></strong> :&ensp;<code>list, tuple, str</code> or <code>NoneType</code></dt>
+<dd>Name or list of names of the exog variables for which parameter
+an annealing plot should be constructed. Must be one of the exog
+variable names. If not supplied annealing plots for all parameters
+are constructed. Default are the supplied exog names.</dd>
+<dt><strong><code>title</code></strong> :&ensp;<code>str</code> or <code>NoneType</code></dt>
+<dd>Title for the annealing plot. Default is
+'RSR: Annealing Sensitivity'.</dd>
+<dt><strong><code>alpha</code></strong> :&ensp;<code>float</code> or <code>NoneType</code></dt>
+<dd>Confidence level alpha. Default is 0.05.</dd>
+<dt><strong><code>percentile</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Percentile method for confidence intervals based on bootstrapping.
+If bootstrapping has not been used for annealing, it is ignored.
+Default is False.</dd>
+<dt><strong><code>color</code></strong> :&ensp;<code>str</code> or <code>NoneType</code></dt>
+<dd>Color used for the confidence interval. Must be one of the
+matplotlib supported colors. Default is grey.</dd>
+<dt><strong><code>path</code></strong> :&ensp;<code>str</code> or <code>NoneType</code></dt>
+<dd>Valid path to save the plot. If None, plot is not saved. Default
+is None.</dd>
+<dt><strong><code>figsize</code></strong> :&ensp;<code>tuple</code> or <code>NoneType</code></dt>
+<dd>Tuple of x and y axis size for matplotlib figsize argument.
+Default is (10,5).</dd>
+<dt><strong><code>ylim</code></strong> :&ensp;<code>tuple, list</code> or <code>NoneType</code></dt>
+<dd>Tuple of upper and lower limits of y axis. Default is automatic.</dd>
+<dt><strong><code>xlabel</code></strong> :&ensp;<code>str</code> or <code>NoneType</code></dt>
+<dd>Label for the x axis for the exog variable. Default is 'xname'.</dd>
+<dt><strong><code>dpi</code></strong> :&ensp;<code>float, int</code> or <code>NoneType</code></dt>
+<dd>The resolution for matplotlib scatter plot. Default is 100.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Dictionary of matplotlib figures. Prints annealing plots.</p>
+<h2 id="notes">Notes</h2>
+<p><a href="#samplefit.Reliability.RSRAnnealResults.plot"><code>.plot()</code></a> produces
+an annealing plot for assessment of sample fit sensitivity, together
+with parameters and confidence intervals.</p>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-py"># import libraries
+import samplefit as sf
+import statsmodels.api as sm
+
+# get data 
+boston = sm.datasets.get_rdataset(&quot;Boston&quot;, &quot;MASS&quot;)
+Y = boston.data['medv'] # median house price
+X = boston.data['rm'] # number of rooms
+X = sm.add_constant(X)
+
+# specify model
+model = sm.OLS(endog=Y, exog=X)
+
+# specify sample
+sample = sf.RSR(linear_model=model)
+
+# sample annealing
+sample_annealing = sample.anneal()
+
+# default annealing plot
+sample_annealing.plot()
+
+# custom annealing
+sample_annealing.plot(title='My Title')
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot(self,
+         xname=None,
+         title=None,
+         alpha=0.05,
+         percentile=False,
+         color=None,
+         path=None,
+         figsize=None,
+         ylim=None,
+         xlabel=None,
+         dpi=None):
+    &#34;&#34;&#34;
+    Plot the Annealing based on the reliability scores via the RSR
+    of class `Sample()`.
+    
+    Parameters
+    ----------
+    xname : list, tuple, str or NoneType
+        Name or list of names of the exog variables for which parameter
+        an annealing plot should be constructed. Must be one of the exog 
+        variable names. If not supplied annealing plots for all parameters
+        are constructed. Default are the supplied exog names.
+    title : str or NoneType
+        Title for the annealing plot. Default is
+        &#39;RSR: Annealing Sensitivity&#39;.
+    alpha : float or NoneType
+        Confidence level alpha. Default is 0.05.
+    percentile : bool
+        Percentile method for confidence intervals based on bootstrapping.
+        If bootstrapping has not been used for annealing, it is ignored.
+        Default is False.
+    color : str or NoneType
+        Color used for the confidence interval. Must be one of the
+        matplotlib supported colors. Default is grey.
+    path : str or NoneType
+        Valid path to save the plot. If None, plot is not saved. Default
+        is None.
+    figsize : tuple or NoneType
+        Tuple of x and y axis size for matplotlib figsize argument.
+        Default is (10,5).
+    ylim : tuple, list or NoneType
+        Tuple of upper and lower limits of y axis. Default is automatic.
+    xlabel : str or NoneType
+        Label for the x axis for the exog variable. Default is &#39;xname&#39;.
+    dpi : float, int or NoneType
+        The resolution for matplotlib scatter plot. Default is 100.
+        
+
+    Returns
+    -------
+    Dictionary of matplotlib figures. Prints annealing plots.
+
+    Notes
+    -----
+    [`.plot()`](#samplefit.Reliability.RSRAnnealResults.plot) produces
+    an annealing plot for assessment of sample fit sensitivity, together
+    with parameters and confidence intervals.
+
+    Examples
+    --------
+    ```py
+    # import libraries
+    import samplefit as sf
+    import statsmodels.api as sm
+    
+    # get data 
+    boston = sm.datasets.get_rdataset(&#34;Boston&#34;, &#34;MASS&#34;)
+    Y = boston.data[&#39;medv&#39;] # median house price
+    X = boston.data[&#39;rm&#39;] # number of rooms
+    X = sm.add_constant(X)
+    
+    # specify model
+    model = sm.OLS(endog=Y, exog=X)
+    
+    # specify sample
+    sample = sf.RSR(linear_model=model)
+    
+    # sample annealing
+    sample_annealing = sample.anneal()
+    
+    # default annealing plot
+    sample_annealing.plot()
+    
+    # custom annealing
+    sample_annealing.plot(title=&#39;My Title&#39;)
+    ```
+    &#34;&#34;&#34;
+    return super().plot(
+        xname=xname,
+        title=title,
+        alpha=alpha,
+        percentile=percentile,
+        color=color,
+        path=path,
+        figsize=figsize,
+        ylim=ylim,
+        xlabel=xlabel,
+        dpi=dpi
+        )</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="samplefit.RSRFitResults"><code class="flex name class">
+<span>class <span class="ident">RSRFitResults</span></span>
+<span>(</span><span>sample=None, params=None, params_boot=None, stand_err=None, fittedvalues=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Reliability Results class labeled <code><a title="samplefit.RSRFitResults" href="#samplefit.RSRFitResults">RSRFitResults</a></code>.
+Initializes output of RSR.fit().</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class RSRFitResults(BaseRSRFitResults):
+    &#34;&#34;&#34;
+    Reliability Results class labeled `RSRFitResults()`.
+    Initializes output of RSR.fit().
+
+    &#34;&#34;&#34;
+
+    # define init function
+    def __init__(self,
+                 sample=None,
+                 params=None,
+                 params_boot=None,
+                 stand_err=None,
+                 fittedvalues=None
+                 ):
+        # access inherited methods
+        super().__init__(
+            sample=sample,
+            params=params,
+            params_boot=params_boot,
+            stand_err=stand_err,
+            fittedvalues=fittedvalues
+        )
+
+
+    def predict(self,
+                params=None,
+                exog=None):
+        &#34;&#34;&#34;
+        Predict outcomes based on the sample fit via the RSR algorithm.
+        
+        Parameters
+        ----------
+        params : array-like or NoneType
+            Array of parameters to predict with. If None supplied, the
+            estimated parameters from the sample fit (weighted or consensus)
+            will be used. Default is None.
+        exog : array-like or NoneType
+            Matrix of features/covariates for which the outcomes should be
+            predicted (out-of-sample). Column dimensions must be identical
+            to the training data supplied to the statsmodels model class.
+            If None supplied, in-sample predictions (fitted values) are
+            returned. Default is None.
+
+        Returns
+        -------
+        Array of predictions.
+
+        Notes
+        -----
+        [`.predict()`](#samplefit.Reliability.RSRFitResults.predict) constructs
+        predictions for outcome variable based on the estimated parameters.
+        Predictions are based on the parameters of weighted fit or consensus
+        fit, depending on the prior .fit() specification. If no new values for
+        exogeneous variables are supplied, fitted values are returned.
+
+        Examples
+        --------
+        ```py
+        # import libraries
+        import samplefit as sf
+        import statsmodels.api as sm
+        
+        # get data 
+        boston = sm.datasets.get_rdataset(&#34;Boston&#34;, &#34;MASS&#34;)
+        Y = boston.data[&#39;medv&#39;] # median house price
+        X = boston.data[&#39;rm&#39;] # number of rooms
+        X = sm.add_constant(X)
+        
+        # specify model
+        model = sm.OLS(endog=Y, exog=X)
+        
+        # specify sample
+        sample = sf.RSR(linear_model=model)
+        
+        # sample fit
+        sample_fit = sample.fit()
+        
+        # predict in-sample
+        preds = sample_fit.predict()
+        
+        # predict out-of-sample
+        preds = sample_fit.predict(exog=X[0, :])
+        ```
+        &#34;&#34;&#34;
+        return super().predict(
+            params=params,
+            exog=exog
+            )
+    
+    
+    def conf_int(self,
+                 alpha=0.05,
+                 percentile=False):
+        &#34;&#34;&#34;
+        Confidence intervals based on the sample fit via the RSR algorithm.
+        
+        Parameters
+        ----------
+        alpha : float or NoneType
+            Confidence level alpha. Default is 0.05.
+        percentile : bool
+            Percentile method for confidence intervals based on bootstrapping.
+            If bootstrapping has not been used for fitting, it is ignored.
+            Default is False.
+
+        Returns
+        -------
+        Tuple of arrays of confidence bounds, lower and upper.
+
+        Notes
+        -----
+        [`.conf_int()`](#samplefit.Reliability.RSRFitResults.conf_int) constructs
+        confidence intervals for estimated paramaters. If fitted without
+        bootstrapping, asymptotic approximations are used. If fitted with
+        bootstrapping, the standard deviation of bootstrapped parameters
+        is used for standard error approximation. If percentile=True, the
+        percentile method is used instead of standard deviation.
+
+        Examples
+        --------
+        ```py
+        # import libraries
+        import samplefit as sf
+        import statsmodels.api as sm
+        
+        # get data 
+        boston = sm.datasets.get_rdataset(&#34;Boston&#34;, &#34;MASS&#34;)
+        Y = boston.data[&#39;medv&#39;] # median house price
+        X = boston.data[&#39;rm&#39;] # number of rooms
+        X = sm.add_constant(X)
+        
+        # specify model
+        model = sm.OLS(endog=Y, exog=X)
+        
+        # specify sample
+        sample = sf.RSR(linear_model=model)
+        
+        # sample fit
+        sample_fit = sample.fit()
+        
+        # compute confidence intervals with default settings
+        ci_low, ci_up = sample_fit.conf_int()
+        
+        # compute confidence intervals with custom alpha
+        ci_low, ci_up = sample_fit.conf_int(alpha=0.1)
+        ```
+        &#34;&#34;&#34;
+        return super().conf_int(
+            alpha=alpha,
+            percentile=percentile
+            )
+    
+    
+    def summary(self,
+                yname=None,
+                xname=None,
+                title=None,
+                alpha=0.05,
+                percentile=False):
+        &#34;&#34;&#34;
+        Summary of the sample fit via the RSR algorithm.
+        
+        Parameters
+        ----------
+        yname : str or NoneType
+            Name of the endog variable. Default is &#39;y&#39;.
+        xname : list, tuple or NoneType
+            List of name of the exog variables. Must have the same dimension as
+            exog columns. Default are the supplied exog names.
+        title : str or NoneType
+            Title for the summary table. Default is
+            &#39;Random Sample Reliability Fit Results&#39;.
+        alpha : float or NoneType
+            Confidence level alpha. Default is 0.05.
+        percentile : bool
+            Percentile method for confidence intervals based on bootstrapping.
+            If bootstrapping has not been used for fitting, it is ignored.
+            Default is False.
+
+        Returns
+        -------
+        None. Prints summary table.
+
+        Notes
+        -----
+        [`.summary()`](#samplefit.Reliability.RSRFitResults.summary) produces
+        a summary table including information on sample fit as well as model
+        fit together with parameters, standard errors, t-values, p-values
+        and confidence intervals.
+
+        Examples
+        --------
+        ```py
+        # import libraries
+        import samplefit as sf
+        import statsmodels.api as sm
+        
+        # get data 
+        boston = sm.datasets.get_rdataset(&#34;Boston&#34;, &#34;MASS&#34;)
+        Y = boston.data[&#39;medv&#39;] # median house price
+        X = boston.data[&#39;rm&#39;] # number of rooms
+        X = sm.add_constant(X)
+        
+        # specify model
+        model = sm.OLS(endog=Y, exog=X)
+        
+        # specify sample
+        sample = sf.RSR(linear_model=model)
+        
+        # sample fit
+        sample_fit = sample.fit()
+        
+        # default summary
+        sample_fit.summary()
+        
+        # custom summary title
+        sample_fit.summary(title=&#39;My Title&#39;)
+        ```
+        &#34;&#34;&#34;
+        return super().summary(
+            yname=yname,
+            xname=xname,
+            title=title,
+            alpha=alpha,
+            percentile=percentile
+            )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>samplefit._BaseResultsReliability.BaseRSRFitResults</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="samplefit.RSRFitResults.conf_int"><code class="name flex">
+<span>def <span class="ident">conf_int</span></span>(<span>self, alpha=0.05, percentile=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Confidence intervals based on the sample fit via the RSR algorithm.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>alpha</code></strong> :&ensp;<code>float</code> or <code>NoneType</code></dt>
+<dd>Confidence level alpha. Default is 0.05.</dd>
+<dt><strong><code>percentile</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Percentile method for confidence intervals based on bootstrapping.
+If bootstrapping has not been used for fitting, it is ignored.
+Default is False.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Tuple of arrays of confidence bounds, lower and upper.</p>
+<h2 id="notes">Notes</h2>
+<p><a href="#samplefit.Reliability.RSRFitResults.conf_int"><code>.conf_int()</code></a> constructs
+confidence intervals for estimated paramaters. If fitted without
+bootstrapping, asymptotic approximations are used. If fitted with
+bootstrapping, the standard deviation of bootstrapped parameters
+is used for standard error approximation. If percentile=True, the
+percentile method is used instead of standard deviation.</p>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-py"># import libraries
+import samplefit as sf
+import statsmodels.api as sm
+
+# get data 
+boston = sm.datasets.get_rdataset(&quot;Boston&quot;, &quot;MASS&quot;)
+Y = boston.data['medv'] # median house price
+X = boston.data['rm'] # number of rooms
+X = sm.add_constant(X)
+
+# specify model
+model = sm.OLS(endog=Y, exog=X)
+
+# specify sample
+sample = sf.RSR(linear_model=model)
+
+# sample fit
+sample_fit = sample.fit()
+
+# compute confidence intervals with default settings
+ci_low, ci_up = sample_fit.conf_int()
+
+# compute confidence intervals with custom alpha
+ci_low, ci_up = sample_fit.conf_int(alpha=0.1)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def conf_int(self,
+             alpha=0.05,
+             percentile=False):
+    &#34;&#34;&#34;
+    Confidence intervals based on the sample fit via the RSR algorithm.
+    
+    Parameters
+    ----------
+    alpha : float or NoneType
+        Confidence level alpha. Default is 0.05.
+    percentile : bool
+        Percentile method for confidence intervals based on bootstrapping.
+        If bootstrapping has not been used for fitting, it is ignored.
+        Default is False.
+
+    Returns
+    -------
+    Tuple of arrays of confidence bounds, lower and upper.
+
+    Notes
+    -----
+    [`.conf_int()`](#samplefit.Reliability.RSRFitResults.conf_int) constructs
+    confidence intervals for estimated paramaters. If fitted without
+    bootstrapping, asymptotic approximations are used. If fitted with
+    bootstrapping, the standard deviation of bootstrapped parameters
+    is used for standard error approximation. If percentile=True, the
+    percentile method is used instead of standard deviation.
+
+    Examples
+    --------
+    ```py
+    # import libraries
+    import samplefit as sf
+    import statsmodels.api as sm
+    
+    # get data 
+    boston = sm.datasets.get_rdataset(&#34;Boston&#34;, &#34;MASS&#34;)
+    Y = boston.data[&#39;medv&#39;] # median house price
+    X = boston.data[&#39;rm&#39;] # number of rooms
+    X = sm.add_constant(X)
+    
+    # specify model
+    model = sm.OLS(endog=Y, exog=X)
+    
+    # specify sample
+    sample = sf.RSR(linear_model=model)
+    
+    # sample fit
+    sample_fit = sample.fit()
+    
+    # compute confidence intervals with default settings
+    ci_low, ci_up = sample_fit.conf_int()
+    
+    # compute confidence intervals with custom alpha
+    ci_low, ci_up = sample_fit.conf_int(alpha=0.1)
+    ```
+    &#34;&#34;&#34;
+    return super().conf_int(
+        alpha=alpha,
+        percentile=percentile
+        )</code></pre>
+</details>
+</dd>
+<dt id="samplefit.RSRFitResults.predict"><code class="name flex">
+<span>def <span class="ident">predict</span></span>(<span>self, params=None, exog=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Predict outcomes based on the sample fit via the RSR algorithm.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>params</code></strong> :&ensp;<code>array-like</code> or <code>NoneType</code></dt>
+<dd>Array of parameters to predict with. If None supplied, the
+estimated parameters from the sample fit (weighted or consensus)
+will be used. Default is None.</dd>
+<dt><strong><code>exog</code></strong> :&ensp;<code>array-like</code> or <code>NoneType</code></dt>
+<dd>Matrix of features/covariates for which the outcomes should be
+predicted (out-of-sample). Column dimensions must be identical
+to the training data supplied to the statsmodels model class.
+If None supplied, in-sample predictions (fitted values) are
+returned. Default is None.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Array of predictions.</p>
+<h2 id="notes">Notes</h2>
+<p><a href="#samplefit.Reliability.RSRFitResults.predict"><code>.predict()</code></a> constructs
+predictions for outcome variable based on the estimated parameters.
+Predictions are based on the parameters of weighted fit or consensus
+fit, depending on the prior .fit() specification. If no new values for
+exogeneous variables are supplied, fitted values are returned.</p>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-py"># import libraries
+import samplefit as sf
+import statsmodels.api as sm
+
+# get data 
+boston = sm.datasets.get_rdataset(&quot;Boston&quot;, &quot;MASS&quot;)
+Y = boston.data['medv'] # median house price
+X = boston.data['rm'] # number of rooms
+X = sm.add_constant(X)
+
+# specify model
+model = sm.OLS(endog=Y, exog=X)
+
+# specify sample
+sample = sf.RSR(linear_model=model)
+
+# sample fit
+sample_fit = sample.fit()
+
+# predict in-sample
+preds = sample_fit.predict()
+
+# predict out-of-sample
+preds = sample_fit.predict(exog=X[0, :])
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def predict(self,
+            params=None,
+            exog=None):
+    &#34;&#34;&#34;
+    Predict outcomes based on the sample fit via the RSR algorithm.
+    
+    Parameters
+    ----------
+    params : array-like or NoneType
+        Array of parameters to predict with. If None supplied, the
+        estimated parameters from the sample fit (weighted or consensus)
+        will be used. Default is None.
+    exog : array-like or NoneType
+        Matrix of features/covariates for which the outcomes should be
+        predicted (out-of-sample). Column dimensions must be identical
+        to the training data supplied to the statsmodels model class.
+        If None supplied, in-sample predictions (fitted values) are
+        returned. Default is None.
+
+    Returns
+    -------
+    Array of predictions.
+
+    Notes
+    -----
+    [`.predict()`](#samplefit.Reliability.RSRFitResults.predict) constructs
+    predictions for outcome variable based on the estimated parameters.
+    Predictions are based on the parameters of weighted fit or consensus
+    fit, depending on the prior .fit() specification. If no new values for
+    exogeneous variables are supplied, fitted values are returned.
+
+    Examples
+    --------
+    ```py
+    # import libraries
+    import samplefit as sf
+    import statsmodels.api as sm
+    
+    # get data 
+    boston = sm.datasets.get_rdataset(&#34;Boston&#34;, &#34;MASS&#34;)
+    Y = boston.data[&#39;medv&#39;] # median house price
+    X = boston.data[&#39;rm&#39;] # number of rooms
+    X = sm.add_constant(X)
+    
+    # specify model
+    model = sm.OLS(endog=Y, exog=X)
+    
+    # specify sample
+    sample = sf.RSR(linear_model=model)
+    
+    # sample fit
+    sample_fit = sample.fit()
+    
+    # predict in-sample
+    preds = sample_fit.predict()
+    
+    # predict out-of-sample
+    preds = sample_fit.predict(exog=X[0, :])
+    ```
+    &#34;&#34;&#34;
+    return super().predict(
+        params=params,
+        exog=exog
+        )</code></pre>
+</details>
+</dd>
+<dt id="samplefit.RSRFitResults.summary"><code class="name flex">
+<span>def <span class="ident">summary</span></span>(<span>self, yname=None, xname=None, title=None, alpha=0.05, percentile=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Summary of the sample fit via the RSR algorithm.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>yname</code></strong> :&ensp;<code>str</code> or <code>NoneType</code></dt>
+<dd>Name of the endog variable. Default is 'y'.</dd>
+<dt><strong><code>xname</code></strong> :&ensp;<code>list, tuple</code> or <code>NoneType</code></dt>
+<dd>List of name of the exog variables. Must have the same dimension as
+exog columns. Default are the supplied exog names.</dd>
+<dt><strong><code>title</code></strong> :&ensp;<code>str</code> or <code>NoneType</code></dt>
+<dd>Title for the summary table. Default is
+'Random Sample Reliability Fit Results'.</dd>
+<dt><strong><code>alpha</code></strong> :&ensp;<code>float</code> or <code>NoneType</code></dt>
+<dd>Confidence level alpha. Default is 0.05.</dd>
+<dt><strong><code>percentile</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Percentile method for confidence intervals based on bootstrapping.
+If bootstrapping has not been used for fitting, it is ignored.
+Default is False.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None. Prints summary table.</p>
+<h2 id="notes">Notes</h2>
+<p><a href="#samplefit.Reliability.RSRFitResults.summary"><code>.summary()</code></a> produces
+a summary table including information on sample fit as well as model
+fit together with parameters, standard errors, t-values, p-values
+and confidence intervals.</p>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-py"># import libraries
+import samplefit as sf
+import statsmodels.api as sm
+
+# get data 
+boston = sm.datasets.get_rdataset(&quot;Boston&quot;, &quot;MASS&quot;)
+Y = boston.data['medv'] # median house price
+X = boston.data['rm'] # number of rooms
+X = sm.add_constant(X)
+
+# specify model
+model = sm.OLS(endog=Y, exog=X)
+
+# specify sample
+sample = sf.RSR(linear_model=model)
+
+# sample fit
+sample_fit = sample.fit()
+
+# default summary
+sample_fit.summary()
+
+# custom summary title
+sample_fit.summary(title='My Title')
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def summary(self,
+            yname=None,
+            xname=None,
+            title=None,
+            alpha=0.05,
+            percentile=False):
+    &#34;&#34;&#34;
+    Summary of the sample fit via the RSR algorithm.
+    
+    Parameters
+    ----------
+    yname : str or NoneType
+        Name of the endog variable. Default is &#39;y&#39;.
+    xname : list, tuple or NoneType
+        List of name of the exog variables. Must have the same dimension as
+        exog columns. Default are the supplied exog names.
+    title : str or NoneType
+        Title for the summary table. Default is
+        &#39;Random Sample Reliability Fit Results&#39;.
+    alpha : float or NoneType
+        Confidence level alpha. Default is 0.05.
+    percentile : bool
+        Percentile method for confidence intervals based on bootstrapping.
+        If bootstrapping has not been used for fitting, it is ignored.
+        Default is False.
+
+    Returns
+    -------
+    None. Prints summary table.
+
+    Notes
+    -----
+    [`.summary()`](#samplefit.Reliability.RSRFitResults.summary) produces
+    a summary table including information on sample fit as well as model
+    fit together with parameters, standard errors, t-values, p-values
+    and confidence intervals.
+
+    Examples
+    --------
+    ```py
+    # import libraries
+    import samplefit as sf
+    import statsmodels.api as sm
+    
+    # get data 
+    boston = sm.datasets.get_rdataset(&#34;Boston&#34;, &#34;MASS&#34;)
+    Y = boston.data[&#39;medv&#39;] # median house price
+    X = boston.data[&#39;rm&#39;] # number of rooms
+    X = sm.add_constant(X)
+    
+    # specify model
+    model = sm.OLS(endog=Y, exog=X)
+    
+    # specify sample
+    sample = sf.RSR(linear_model=model)
+    
+    # sample fit
+    sample_fit = sample.fit()
+    
+    # default summary
+    sample_fit.summary()
+    
+    # custom summary title
+    sample_fit.summary(title=&#39;My Title&#39;)
+    ```
+    &#34;&#34;&#34;
+    return super().summary(
+        yname=yname,
+        xname=xname,
+        title=title,
+        alpha=alpha,
+        percentile=percentile
+        )</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="samplefit.RSRScoreResults"><code class="flex name class">
+<span>class <span class="ident">RSRScoreResults</span></span>
+<span>(</span><span>sample=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Reliability Results class labeled <code><a title="samplefit.RSRScoreResults" href="#samplefit.RSRScoreResults">RSRScoreResults</a></code>.
+Initializes output of RSR.score().</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class RSRScoreResults(BaseRSRScoreResults):
+    &#34;&#34;&#34;
+    Reliability Results class labeled `RSRScoreResults()`.
+    Initializes output of RSR.score().
+
+    &#34;&#34;&#34;
+
+    # define init function
+    def __init__(self,
+                 sample=None
+                 ):
+        # access inherited methods
+        super().__init__(
+            sample=sample
+            )
+
+
+    def plot(self,
+             yname=None,
+             xname=None,
+             title=None,
+             cmap=None,
+             path=None,
+             figsize=None,
+             s=None,
+             ylim=None,
+             xlabel=None,
+             dpi=None):
+        &#34;&#34;&#34;
+        Plot the Reliability Scores based on the RSR algorithm.
+        
+        Parameters
+        ----------
+        yname : str or NoneType
+            Name of the endog variable. Default is &#39;y&#39;.
+        xname : list, tuple, str or NoneType
+            Name or list of names of the exog variables for which parameter
+            an annealing plot should be constructed. Must be one of the exog 
+            variable names. If not supplied annealing plots for all parameters
+            are constructed. Default are the supplied exog names.
+        title : str or NoneType
+            Title for the annealing plot. Default is
+            &#39;RSR: Annealing Sensitivity&#39;.
+        cmap : str or NoneType
+            Color map used for the reliability score. Must be one of the
+            matplotlib supported color maps. Default is &#39;RdYlGn&#39;.
+        path : str or NoneType
+            Valid path to save the plot. If None, plot is not saved. Default
+            is None.
+        figsize : tuple or NoneType
+            Tuple of x and y axis size for matplotlib figsize argument.
+            Default is (10,5).
+        s : float, int or NoneType
+            The marker size in points**2 for in matplotlib scatter plot.
+            Default is automatic.
+        ylim : tuple, list or NoneType
+            Tuple of upper and lower limits of y axis. Default is automatic.
+        xlabel : str or NoneType
+            Label for the x axis for the exog variable. Default is &#39;xname&#39;.
+        dpi : float, int or NoneType
+            The resolution for matplotlib scatter plot. Default is 100.
+            
+
+        Returns
+        -------
+        Dictionary of matplotlib figures. Prints annealing plots.
+
+        Notes
+        -----
+        [`.plot()`](#samplefit.Reliability.RSRAnnealResults.plot) produces
+        an annealing plot for assessment of sample fit sensitivity, together
+        with parameters and confidence intervals.
+
+        Examples
+        --------
+        ```py
+        # import libraries
+        import samplefit as sf
+        import statsmodels.api as sm
+        
+        # get data 
+        boston = sm.datasets.get_rdataset(&#34;Boston&#34;, &#34;MASS&#34;)
+        Y = boston.data[&#39;medv&#39;] # median house price
+        X = boston.data[&#39;rm&#39;] # number of rooms
+        X = sm.add_constant(X)
+        
+        # specify model
+        model = sm.OLS(endog=Y, exog=X)
+        
+        # specify sample
+        sample = sf.RSR(linear_model=model)
+        
+        # sample annealing
+        sample_annealing = sample.anneal()
+        
+        # default annealing plot
+        sample_annealing.plot()
+        
+        # custom annealing
+        sample_annealing.plot(title=&#39;My Title&#39;)
+        ```
+        &#34;&#34;&#34;
+        return super().plot(
+            yname=yname,
+            xname=xname,
+            title=title,
+            cmap=cmap,
+            path=path,
+            figsize=figsize,
+            s=s,
+            ylim=ylim,
+            xlabel=xlabel,
+            dpi=dpi
+            )</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>samplefit._BaseResultsReliability.BaseRSRScoreResults</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="samplefit.RSRScoreResults.plot"><code class="name flex">
+<span>def <span class="ident">plot</span></span>(<span>self, yname=None, xname=None, title=None, cmap=None, path=None, figsize=None, s=None, ylim=None, xlabel=None, dpi=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Plot the Reliability Scores based on the RSR algorithm.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>yname</code></strong> :&ensp;<code>str</code> or <code>NoneType</code></dt>
+<dd>Name of the endog variable. Default is 'y'.</dd>
+<dt><strong><code>xname</code></strong> :&ensp;<code>list, tuple, str</code> or <code>NoneType</code></dt>
+<dd>Name or list of names of the exog variables for which parameter
+an annealing plot should be constructed. Must be one of the exog
+variable names. If not supplied annealing plots for all parameters
+are constructed. Default are the supplied exog names.</dd>
+<dt><strong><code>title</code></strong> :&ensp;<code>str</code> or <code>NoneType</code></dt>
+<dd>Title for the annealing plot. Default is
+'RSR: Annealing Sensitivity'.</dd>
+<dt><strong><code>cmap</code></strong> :&ensp;<code>str</code> or <code>NoneType</code></dt>
+<dd>Color map used for the reliability score. Must be one of the
+matplotlib supported color maps. Default is 'RdYlGn'.</dd>
+<dt><strong><code>path</code></strong> :&ensp;<code>str</code> or <code>NoneType</code></dt>
+<dd>Valid path to save the plot. If None, plot is not saved. Default
+is None.</dd>
+<dt><strong><code>figsize</code></strong> :&ensp;<code>tuple</code> or <code>NoneType</code></dt>
+<dd>Tuple of x and y axis size for matplotlib figsize argument.
+Default is (10,5).</dd>
+<dt><strong><code>s</code></strong> :&ensp;<code>float, int</code> or <code>NoneType</code></dt>
+<dd>The marker size in points**2 for in matplotlib scatter plot.
+Default is automatic.</dd>
+<dt><strong><code>ylim</code></strong> :&ensp;<code>tuple, list</code> or <code>NoneType</code></dt>
+<dd>Tuple of upper and lower limits of y axis. Default is automatic.</dd>
+<dt><strong><code>xlabel</code></strong> :&ensp;<code>str</code> or <code>NoneType</code></dt>
+<dd>Label for the x axis for the exog variable. Default is 'xname'.</dd>
+<dt><strong><code>dpi</code></strong> :&ensp;<code>float, int</code> or <code>NoneType</code></dt>
+<dd>The resolution for matplotlib scatter plot. Default is 100.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Dictionary of matplotlib figures. Prints annealing plots.</p>
+<h2 id="notes">Notes</h2>
+<p><a href="#samplefit.Reliability.RSRAnnealResults.plot"><code>.plot()</code></a> produces
+an annealing plot for assessment of sample fit sensitivity, together
+with parameters and confidence intervals.</p>
+<h2 id="examples">Examples</h2>
+<pre><code class="language-py"># import libraries
+import samplefit as sf
+import statsmodels.api as sm
+
+# get data 
+boston = sm.datasets.get_rdataset(&quot;Boston&quot;, &quot;MASS&quot;)
+Y = boston.data['medv'] # median house price
+X = boston.data['rm'] # number of rooms
+X = sm.add_constant(X)
+
+# specify model
+model = sm.OLS(endog=Y, exog=X)
+
+# specify sample
+sample = sf.RSR(linear_model=model)
+
+# sample annealing
+sample_annealing = sample.anneal()
+
+# default annealing plot
+sample_annealing.plot()
+
+# custom annealing
+sample_annealing.plot(title='My Title')
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot(self,
+         yname=None,
+         xname=None,
+         title=None,
+         cmap=None,
+         path=None,
+         figsize=None,
+         s=None,
+         ylim=None,
+         xlabel=None,
+         dpi=None):
+    &#34;&#34;&#34;
+    Plot the Reliability Scores based on the RSR algorithm.
+    
+    Parameters
+    ----------
+    yname : str or NoneType
+        Name of the endog variable. Default is &#39;y&#39;.
+    xname : list, tuple, str or NoneType
+        Name or list of names of the exog variables for which parameter
+        an annealing plot should be constructed. Must be one of the exog 
+        variable names. If not supplied annealing plots for all parameters
+        are constructed. Default are the supplied exog names.
+    title : str or NoneType
+        Title for the annealing plot. Default is
+        &#39;RSR: Annealing Sensitivity&#39;.
+    cmap : str or NoneType
+        Color map used for the reliability score. Must be one of the
+        matplotlib supported color maps. Default is &#39;RdYlGn&#39;.
+    path : str or NoneType
+        Valid path to save the plot. If None, plot is not saved. Default
+        is None.
+    figsize : tuple or NoneType
+        Tuple of x and y axis size for matplotlib figsize argument.
+        Default is (10,5).
+    s : float, int or NoneType
+        The marker size in points**2 for in matplotlib scatter plot.
+        Default is automatic.
+    ylim : tuple, list or NoneType
+        Tuple of upper and lower limits of y axis. Default is automatic.
+    xlabel : str or NoneType
+        Label for the x axis for the exog variable. Default is &#39;xname&#39;.
+    dpi : float, int or NoneType
+        The resolution for matplotlib scatter plot. Default is 100.
+        
+
+    Returns
+    -------
+    Dictionary of matplotlib figures. Prints annealing plots.
+
+    Notes
+    -----
+    [`.plot()`](#samplefit.Reliability.RSRAnnealResults.plot) produces
+    an annealing plot for assessment of sample fit sensitivity, together
+    with parameters and confidence intervals.
+
+    Examples
+    --------
+    ```py
+    # import libraries
+    import samplefit as sf
+    import statsmodels.api as sm
+    
+    # get data 
+    boston = sm.datasets.get_rdataset(&#34;Boston&#34;, &#34;MASS&#34;)
+    Y = boston.data[&#39;medv&#39;] # median house price
+    X = boston.data[&#39;rm&#39;] # number of rooms
+    X = sm.add_constant(X)
+    
+    # specify model
+    model = sm.OLS(endog=Y, exog=X)
+    
+    # specify sample
+    sample = sf.RSR(linear_model=model)
+    
+    # sample annealing
+    sample_annealing = sample.anneal()
+    
+    # default annealing plot
+    sample_annealing.plot()
+    
+    # custom annealing
+    sample_annealing.plot(title=&#39;My Title&#39;)
+    ```
+    &#34;&#34;&#34;
+    return super().plot(
+        yname=yname,
+        xname=xname,
+        title=title,
+        cmap=cmap,
+        path=path,
+        figsize=figsize,
+        s=s,
+        ylim=ylim,
+        xlabel=xlabel,
+        dpi=dpi
+        )</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul>
+<li><a href="#description">Description</a></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#examples">Examples</a></li>
+<li><a href="#authors">Authors</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+</div>
+<ul id="index">
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<ul>
+<li><code><a title="samplefit.Reliability" href="Reliability.html">samplefit.Reliability</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="samplefit.RSR" href="#samplefit.RSR">RSR</a></code></h4>
+<ul class="">
+<li><code><a title="samplefit.RSR.anneal" href="#samplefit.RSR.anneal">anneal</a></code></li>
+<li><code><a title="samplefit.RSR.fit" href="#samplefit.RSR.fit">fit</a></code></li>
+<li><code><a title="samplefit.RSR.score" href="#samplefit.RSR.score">score</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="samplefit.RSRAnnealResults" href="#samplefit.RSRAnnealResults">RSRAnnealResults</a></code></h4>
+<ul class="">
+<li><code><a title="samplefit.RSRAnnealResults.conf_int" href="#samplefit.RSRAnnealResults.conf_int">conf_int</a></code></li>
+<li><code><a title="samplefit.RSRAnnealResults.plot" href="#samplefit.RSRAnnealResults.plot">plot</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="samplefit.RSRFitResults" href="#samplefit.RSRFitResults">RSRFitResults</a></code></h4>
+<ul class="">
+<li><code><a title="samplefit.RSRFitResults.conf_int" href="#samplefit.RSRFitResults.conf_int">conf_int</a></code></li>
+<li><code><a title="samplefit.RSRFitResults.predict" href="#samplefit.RSRFitResults.predict">predict</a></code></li>
+<li><code><a title="samplefit.RSRFitResults.summary" href="#samplefit.RSRFitResults.summary">summary</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="samplefit.RSRScoreResults" href="#samplefit.RSRScoreResults">RSRScoreResults</a></code></h4>
+<ul class="">
+<li><code><a title="samplefit.RSRScoreResults.plot" href="#samplefit.RSRScoreResults.plot">plot</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

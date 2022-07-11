@@ -12,11 +12,14 @@
 
  Installation
  ----------------------------
- To install the latest `PyPi` released version run
+ 
+ To clone the repo for the `samplefit` library run:
+
  ```
- pip install samplefit
+ git clone https://github.com/okasag/samplefit.git
  ```
- in the terminal. `samplefit` requires the following dependencies:
+
+ `samplefit` relies on Python 3 and requires the following dependencies:
      
  * numpy (>=1.22.0)
  * pandas (>=1.3.5)
@@ -24,13 +27,9 @@
  * statsmodels (>=0.12.2)
  * matplotlib (>=3.4.2)
  
- In case of an installation failure due to dependency 
- issues or conflicts with Anaconda distribution,
- consider installing the package in a virtual 
- environment or try `pip install samplefit --user`.
- 
- The implementation relies on Python 3 and is compatible with 
- version 3.8, 3.9 and 3.10.
+ The required modules can be installed by navigating to the root of the cloned
+ project and executing the following command:
+ `pip install -r requirements.txt`. 
 
  Examples
  ----------------------------
@@ -84,8 +83,8 @@
 
  References
  ----------------------------
- - Okasa, Gabriel, and Kenneth A. Younge. “Sample Fit: Random Sample
-  Reliability.” arXiv preprint arXiv:xxxx.xxxxx. 2022.
+ - Okasa, Gabriel, and Kenneth A. Younge. “Random Sample Reliability.”
+ Working Paper. 2022.
  - Seabold, Skipper, and Josef Perktold. “statsmodels: Econometric and 
  statistical modeling with python.” Proceedings of the 9th Python in Science 
  Conference. 2010.

@@ -24,3 +24,7 @@ MANIFEST
 # exclude testing files
 samplefit_replication.ipynb
 samplefit_testing.ipynb
+
+# exclude data and html files
+data/
+html/
