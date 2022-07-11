@@ -14,6 +14,8 @@ Repo maintainer: Gabriel Okasa ([gabriel.okasa@epfl.ch](mailto:gabriel.okasa@epf
 
 Researchers frequently test model fit by holding data constant and varying the model. We propose Random Sample Reliability (RSR) as a computational framework to test sample fit by holding the model constant and varying the data. Random Sample Reliability re-samples data to estimate the reliability of observations of a sample. RSR can be used to score the reliability of every observation within the sample, test the sensitivity of results to atypical observations via annealing procedure, and estimate a weighted fit where the analysis is more robust.
 
+Detailed documentation of the `samplefit` library is available [here](https://okasag.github.io/samplefit/).
+
 ## Installation
 
 To clone this repo for the `samplefit` library run:
