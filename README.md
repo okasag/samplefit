@@ -16,6 +16,8 @@ Researchers frequently test model fit by holding data constant and varying the m
 
 Detailed documentation of the `samplefit` library is available [here](https://okasag.github.io/samplefit/).
 
+Poster describing the RSR algorithm is available [here](https://okasag.github.io/assets/pdf/Okasa_Younge_RSR_Poster_SciPy.pdf).
+
 ## Installation
 
 To clone this repo for the `samplefit` library run:
