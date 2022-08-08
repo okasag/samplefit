@@ -18,7 +18,7 @@ import pandas as pd
 
 # import submodules and functions
 from scipy import stats
-# TODO: from joblib import Parallel, delayed, parallel_backend
+from joblib import Parallel, delayed, parallel_backend
 from multiprocessing import cpu_count, Lock
 # TODO: add check_random_state from statsmodels 0.14.0
 
@@ -365,47 +365,32 @@ class BaseRSR:
     
         # get indices to sample from
         indices = np.arange(len(endog), dtype=int)
-            
         # controls for the optimization
         iter_loss_value = {}
-        sample_idx = 0
         
-        # start sampling loop
-        while sample_idx < n_samples:
-            
-            # initiate loss vector with NAs
-            loss_value = np.empty(len(endog))
-            loss_value[:] = np.nan
-    
-            # subsample data without replacement
-            # get in bag indices
-            in_idx = np.random.choice(indices, size=min_samples, replace=False)
-            # get out of bag indices
-            oob_idx = np.setdiff1d(indices, in_idx)
-            
-            # in bag observations
-            endog_in = endog[in_idx]
-            exog_in = exog[in_idx, :]
-            # out of bag observations
-            endog_out = endog[oob_idx]
-            exog_out = exog[oob_idx, :]
-    
-            # check if the sample is valid
-            if self._is_sample_valid(exog_in):
-                # update sample_idx
-                sample_idx +=1
-            else:
-                # continue with new draw
-                continue
-            
-            # estimate the betas
-            betas = np.linalg.inv(exog_in.T @ exog_in) @ (exog_in.T @ endog_in)
-            # predict out-of-bag
-            oob_pred = exog_out @ betas
-            # evaluate the error for out-of-bag observations
-            loss_value[oob_idx] = loss(endog_out, oob_pred)
-            # save the results
-            iter_loss_value[sample_idx] = loss_value
+        # check if resampling should be done in parallel
+        if self.n_jobs > 1:
+            # Loop over samples in parallel using joblib
+            with parallel_backend('loky',
+                                  n_jobs=self.n_jobs):
+                loss_value = Parallel()(
+                    delayed(self._estimate_loss)(
+                        endog=endog,
+                        exog=exog,
+                        min_samples=min_samples,
+                        loss=loss) for sample_idx in range(n_samples))
+            # assign the results
+            iter_loss_value = np.vstack(loss_value).T
+        else:
+            # sequential execution
+            for sample_idx in range(n_samples):
+                # estimate resample loss
+                loss_value = self._estimate_loss(endog=endog,
+                                                 exog=exog,
+                                                 min_samples=min_samples,
+                                                 loss=loss)
+                # save the results for current iteration
+                iter_loss_value[sample_idx] = loss_value
         
         # resampling loss: rows are observations, columns are iterations
         resampling_loss = pd.DataFrame(iter_loss_value)
@@ -419,6 +404,55 @@ class BaseRSR:
         # return the reliability scores
         return scores
     
+    
+    # function to estimate the individual loss
+    def _estimate_loss(self, endog, exog, min_samples, loss):
+        """Estimate the individual sample loss."""
+    
+        # get indices to sample from
+        indices = np.arange(len(endog), dtype=int)
+        
+        # initiate loss vector with NAs
+        loss_value = np.empty(len(endog))
+        loss_value[:] = np.nan
+            
+        # controls for the optimization
+        full_rank = False
+        
+        # start sampling loop
+        while not full_rank:
+    
+            # subsample data without replacement
+            # get in bag indices
+            in_idx = np.random.choice(indices, size=min_samples, replace=False)
+            # in bag observations
+            endog_in = endog[in_idx]
+            exog_in = exog[in_idx, :]
+            
+            # check if the sample is valid
+            if self._is_sample_valid(exog_in):
+                # update condition
+                full_rank = True
+            else:
+                # continue with new draw
+                continue
+        
+        # get out of bag indices
+        oob_idx = np.setdiff1d(indices, in_idx)
+        # out of bag observations
+        endog_out = endog[oob_idx]
+        exog_out = exog[oob_idx, :]
+            
+        # estimate the betas
+        betas = np.linalg.inv(exog_in.T @ exog_in) @ (exog_in.T @ endog_in)
+        # predict out-of-bag
+        oob_pred = exog_out @ betas
+        # evaluate the error for out-of-bag observations
+        loss_value[oob_idx] = loss(endog_out, oob_pred)
+        
+        # return the individual sample loss
+        return loss_value
+
 
     # function to estimate the boosted reliability scores
     def _estimate_boosted_scores(self,
