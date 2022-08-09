@@ -19,7 +19,7 @@ import pandas as pd
 # import submodules and functions
 from scipy import stats
 from joblib import Parallel, delayed, parallel_backend
-from multiprocessing import cpu_count, Lock
+from psutil import cpu_count
 # TODO: add check_random_state from statsmodels 0.14.0
 
 
@@ -202,8 +202,8 @@ class BaseRSR:
 
         # check whether n_jobs is integer
         if isinstance(n_jobs, int):
-            # check max available cores
-            max_jobs = cpu_count()
+            # check max available physical cores
+            max_jobs = cpu_count(logical=False)
             # check if it is -1
             if n_jobs == -1:
                 # set max - 1 as default
@@ -363,8 +363,6 @@ class BaseRSR:
     def _estimate_scores(self, endog, exog, n_samples, min_samples, loss):
         """Estimate the reliability scores via RSR algorithm."""
     
-        # get indices to sample from
-        indices = np.arange(len(endog), dtype=int)
         # controls for the optimization
         iter_loss_value = {}
         
