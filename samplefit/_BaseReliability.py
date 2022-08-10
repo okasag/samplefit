@@ -223,10 +223,26 @@ class BaseRSR:
         else:
             # raise value error
             raise ValueError("n_jobs must be of type integer or None"
-                             ", got %s" % n_jobs)
+                             ", got %s" % type(n_jobs))
 
         # check whether seed is set
-        self.random_state = random_state
+        if random_state is None:
+            # initiate seed as zero
+            self.random_state = 0
+        # chekc if its integer
+        elif isinstance(random_state, int):
+            # if its non-negative
+            if random_state >= 0:
+                # assign the user supplied value
+                self.random_state = random_state
+            else:
+                # throw an error
+                raise ValueError("random_state must be equal or greater than 0"
+                                 ", got %s" % random_state)
+        else:
+            # raise value error
+            raise ValueError("random_state must be of type integer or None"
+                             ", got %s" % type(random_state))
         # TODO: self.random_state = check_random_state(random_state)
         # get max np.int32 based on machine limit
         max_int = np.iinfo(np.int32).max
