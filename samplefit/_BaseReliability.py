@@ -231,8 +231,9 @@ class BaseRSR:
         # get max np.int32 based on machine limit
         max_int = np.iinfo(np.int32).max
 
-        # initiate the reliability scores
+        # initiate the reliability scores and bootstrapping
         self.scores = None
+        self.n_boot = None
 
 
     # %% score function
@@ -241,6 +242,9 @@ class BaseRSR:
         """
         RSR reliability scores estimation.
         """
+        
+        # restore bootstrapping
+        self.n_boot = None
         
         # check if boosting should be performed
         if self.boost is None:
@@ -325,26 +329,23 @@ class BaseRSR:
         """
         
         # check anneal inputs
-        self._check_anneal_inputs(share, n_boot)
-        
-        # get reliability scores first
-        rsr_scores = self._check_fitted_scores()
+        rsr_scores = self._check_anneal_inputs(share, n_boot)
         
         # compute gini coefficient of the scores
         self.gini = self._gini_coef(rsr_scores)
         
         # remove sequantially share*n_obs of most unreliable datapoints
-        n_drop = int(np.ceil(self.share * self.n_obs))
+        self.n_drop = int(np.ceil(self.share * self.n_obs))
         
         # annealing fit
         betas, betas_se, drop_idx = self._annealing_fit(endog=self.endog,
                                                         exog=self.exog,
                                                         scores=rsr_scores,
-                                                        n_drop=n_drop)
+                                                        n_drop=self.n_drop)
         
         # estimate standard errors if inference needed
         if self.n_boot is None:
-            # asymptotic approximation
+            # asymptotic approximation already done as default
             boot_betas = None
         else:
             # bootstrap approximation
@@ -366,8 +367,8 @@ class BaseRSR:
         # controls for the optimization
         iter_loss_value = {}
         
-        # check if resampling should be done in parallel
-        if self.n_jobs > 1:
+        # check if resampling should be done parallel (avoid double parallel)
+        if ((self.n_jobs > 1) and (self.n_boot is None)):
             # Loop over samples in parallel using joblib
             with parallel_backend('loky',
                                   n_jobs=self.n_jobs):
@@ -376,7 +377,9 @@ class BaseRSR:
                         endog=endog,
                         exog=exog,
                         min_samples=min_samples,
-                        loss=loss) for sample_idx in range(n_samples))
+                        loss=loss,
+                        seed=(self.random_state + sample_idx)
+                        ) for sample_idx in range(n_samples))
             # assign the results
             iter_loss_value = np.vstack(loss_value).T
         else:
@@ -386,7 +389,9 @@ class BaseRSR:
                 loss_value = self._estimate_loss(endog=endog,
                                                  exog=exog,
                                                  min_samples=min_samples,
-                                                 loss=loss)
+                                                 loss=loss,
+                                                 seed=(self.random_state +
+                                                 sample_idx))
                 # save the results for current iteration
                 iter_loss_value[sample_idx] = loss_value
         
@@ -404,9 +409,12 @@ class BaseRSR:
     
     
     # function to estimate the individual loss
-    def _estimate_loss(self, endog, exog, min_samples, loss):
+    def _estimate_loss(self, endog, exog, min_samples, loss, seed):
         """Estimate the individual sample loss."""
-    
+        
+        # fix the seed
+        np.random.seed(seed)
+        
         # get indices to sample from
         indices = np.arange(len(endog), dtype=int)
         
@@ -613,69 +621,25 @@ class BaseRSR:
         # controls for the optimization
         boot_betas = {}
         
-        # fix the seed
-        np.random.seed(self.random_state)
-        
-        # start sampling loop
-        for boot_idx in range(self.n_boot):
-    
-            # resample data with replacement
-            # get in bag indices
-            in_idx = np.random.choice(np.arange(self.n_obs, dtype=int),
-                                      size=self.n_obs, replace=True)
-            
-            # in bag observations
-            endog_in = self.endog[in_idx]
-            exog_in = self.exog[in_idx, :]
-    
-            # estimate the scores
-            if self.boost is None:
-                # estimate standard scores
-                scores_idx = self._estimate_scores(endog=endog_in,
-                                                   exog=exog_in,
-                                                   n_samples=self.n_samples,
-                                                   min_samples=self.min_samples,
-                                                   loss=self.loss_function)
-            else:
-                # run the boosted RSR algorithm to estimate reliability scores  
-                scores_idx = self._estimate_boosted_scores(endog=endog_in,
-                                                           exog=exog_in,
-                                                           n_samples=self.n_samples,
-                                                           min_samples=self.min_samples,
-                                                           loss=self.loss_function)
-            
-            # check if bootstrap should be used for annealing
-            if not anneal:
-                # fit the reliable model: either weighted fit or consensus fit
-                if self.weighted:
-                    # get weights
-                    if not self.user_weights:
-                        # default squared weights (reflected in inference)
-                        weights_idx = scores_idx ** 2
-                    else:
-                        # user-supplied weights (not reflected in inference)
-                        weights_idx = self.weights[in_idx]
-                    # weighted fit (1 x n_params)
-                    betas_idx = self._weighted_fit(endog=endog_in,
-                                                   exog=exog_in,
-                                                   scores=weights_idx)
-                else:
-                    # consensus fit (1 x n_params)
-                    betas_idx = self._consensus_fit(endog=endog_in,
-                                                    exog=exog_in,
-                                                    scores=scores_idx)[0]
-            # otherwise do the annealing fit
-            else:
-                # get the number of drop observations
-                n_drop = int(np.ceil(self.share * self.n_obs))
-                # get the annealing fit (n_drop+1 x n_params)
-                betas_idx = self._annealing_fit(endog=endog_in,
-                                                exog=exog_in,
-                                                scores=scores_idx,
-                                                n_drop=n_drop)[0]
-
-            # save the results
-            boot_betas[boot_idx] = betas_idx
+        # check if parallelisation should be used
+        if self.n_jobs > 1:
+            # use multiprocessing using joblib
+            with parallel_backend('loky',
+                                  n_jobs=self.n_jobs):
+                boot_betas = Parallel()(
+                    delayed(self._boot_iter)(
+                        anneal=anneal,
+                        seed=(self.random_state + boot_idx)
+                        ) for boot_idx in range(self.n_boot))
+            # assign the results
+            boot_betas = {key:value for key, value in enumerate(boot_betas)}
+        else:
+            # start sampling loop in serial
+            for boot_idx in range(self.n_boot):
+                # save the results in a dictionary
+                boot_betas[boot_idx] = self._boot_iter(anneal=anneal,
+                                                       seed=(self.random_state
+                                                             + boot_idx))
             
         # different output shapes for annealing
         if not anneal:
@@ -686,9 +650,9 @@ class BaseRSR:
         # otherwise coefficient paths
         else:
             # create empty storage for betas_se
-            betas_se = np.zeros([n_drop + 1, self.n_exog])
+            betas_se = np.zeros([self.n_drop + 1, self.n_exog])
             # loop through each drop in dictionary and get std (incl. full)
-            for drop_idx in range(n_drop + 1):
+            for drop_idx in range(self.n_drop + 1):
                 # create temp storage (n_boot x n_params)
                 boot_drop = np.zeros([self.n_boot, self.n_exog])
                 # loop through each key in a dictionary
@@ -701,7 +665,70 @@ class BaseRSR:
         # return the se and bootstrap results of reliability fit
         return betas_se, boot_betas
 
+    
+    # bootstrap iterations
+    def _boot_iter(self, anneal, seed):
+        """Perform a bootstrap iteration."""
+        
+        # fix the seed
+        np.random.seed(seed)
+        # resample data with replacement
+        # get in bag indices
+        in_idx = np.random.choice(np.arange(self.n_obs, dtype=int),
+                                  size=self.n_obs, replace=True)
+        
+        # in bag observations
+        endog_in = self.endog[in_idx]
+        exog_in = self.exog[in_idx, :]
 
+        # estimate the scores
+        if self.boost is None:
+            # estimate standard scores
+            scores_idx = self._estimate_scores(endog=endog_in,
+                                               exog=exog_in,
+                                               n_samples=self.n_samples,
+                                               min_samples=self.min_samples,
+                                               loss=self.loss_function)
+        else:
+            # run the boosted RSR algorithm to estimate reliability scores  
+            scores_idx = self._estimate_boosted_scores(endog=endog_in,
+                                                       exog=exog_in,
+                                                       n_samples=self.n_samples,
+                                                       min_samples=self.min_samples,
+                                                       loss=self.loss_function)
+        
+        # check if bootstrap should be used for annealing
+        if not anneal:
+            # fit the reliable model: either weighted fit or consensus fit
+            if self.weighted:
+                # get weights
+                if not self.user_weights:
+                    # default squared weights (reflected in inference)
+                    weights_idx = scores_idx ** 2
+                else:
+                    # user-supplied weights (not reflected in inference)
+                    weights_idx = self.weights[in_idx]
+                # weighted fit (1 x n_params)
+                betas_idx = self._weighted_fit(endog=endog_in,
+                                               exog=exog_in,
+                                               scores=weights_idx)
+            else:
+                # consensus fit (1 x n_params)
+                betas_idx = self._consensus_fit(endog=endog_in,
+                                                exog=exog_in,
+                                                scores=scores_idx)[0]
+        # otherwise do the annealing fit
+        else:
+            # get the annealing fit (n_drop+1 x n_params)
+            betas_idx = self._annealing_fit(endog=endog_in,
+                                            exog=exog_in,
+                                            scores=scores_idx,
+                                            n_drop=self.n_drop)[0]
+
+        # return the results
+        return betas_idx
+
+        
     # Function for weighted fit
     def _weighted_fit(self, endog, exog, scores):
         """Weighted fit based on reliability scores."""
@@ -772,6 +799,7 @@ class BaseRSR:
         obs_drop = []
         
         # loop through the first share% of observations
+        # this needs to be sequential - no pralallelisation
         for obs_idx in sorted_scores[0:n_drop]:
             # update obs_drop
             obs_drop.append(obs_idx)
@@ -836,6 +864,25 @@ class BaseRSR:
     def _check_fit_inputs(self, weights, consensus, n_boot):
         """Input checks for the .fit() function."""
         
+        # check if bootstrapping or asymptotic inference should be done
+        if n_boot is None:
+            # assign None
+            self.n_boot = None
+        # otherwise check how many replication should be used for inference
+        elif isinstance(n_boot, int):
+            # check if its at least 2
+            if n_boot >= 2:
+                # assign the input value
+                self.n_boot = n_boot
+            else:
+                # raise value error
+                raise ValueError("n_boot must be at least 2"
+                                 ", got %s" % n_boot)
+        else:
+            # raise value error
+            raise ValueError("n_boot must be an integer or NoneType"
+                             ", got %s" % type(n_boot))
+
         # check fitted scores
         rsr_scores = self._check_fitted_scores()
         
@@ -901,7 +948,15 @@ class BaseRSR:
             # raise value error
             raise ValueError("weights and consensus are not compatible, "
                              "check the documentation.")
-    
+            
+        # return rsr scores
+        return rsr_scores
+
+
+    # function for anneal inputs checks
+    def _check_anneal_inputs(self, share, n_boot):
+        """Input checks for the .anneal() function."""
+        
         # check if bootstrapping or asymptotic inference should be done
         if n_boot is None:
             # assign None
@@ -920,14 +975,9 @@ class BaseRSR:
             # raise value error
             raise ValueError("n_boot must be an integer or NoneType"
                              ", got %s" % type(n_boot))
-            
-        # return rsr scores
-        return rsr_scores
 
-
-    # function for anneal inputs checks
-    def _check_anneal_inputs(self, share, n_boot):
-        """Input checks for the .anneal() function."""
+        # get reliability scores
+        rsr_scores = self._check_fitted_scores()
         
         # check the share option
         if isinstance(share, float):
@@ -943,22 +993,5 @@ class BaseRSR:
             # raise value error
             raise ValueError("share must be a float"
                              ", got %s" % type(share))
-
-        # check if bootstrapping or asymptotic inference should be done
-        if n_boot is None:
-            # assign None
-            self.n_boot = None
-        # otherwise check how many replication should be used for inference
-        elif isinstance(n_boot, int):
-            # check if its at least 2
-            if n_boot >= 2:
-                # assign the input value
-                self.n_boot = n_boot
-            else:
-                # raise value error
-                raise ValueError("n_boot must be at least 2"
-                                 ", got %s" % n_boot)
-        else:
-            # raise value error
-            raise ValueError("n_boot must be an integer or NoneType"
-                             ", got %s" % type(n_boot))
+        
+        return rsr_scores

@@ -6,8 +6,8 @@ import statsmodels.api as sm
 
 # get data
 boston = sm.datasets.get_rdataset("Boston", "MASS")
-Y = boston.data['medv'] # median home value
-X = boston.data['rm'] # number of rooms
+Y = boston.data['crim'] # crime rate
+X = boston.data['lstat'] # % of lower status
 X = sm.add_constant(X)
 
 # assess model fit
