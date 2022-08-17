@@ -214,13 +214,14 @@ class BaseRSRFitResults:
     
     # function to print summary
     def summary(self, yname=None, xname=None, title=None, alpha=0.05,
-                percentile=False):
+                percentile=False, get_table=False):
         """
         RSR fit summary.
         """
         
         # check inputs for summary
-        self._check_summary_inputs(yname, xname, title, alpha, percentile)
+        self._check_summary_inputs(yname, xname, title, alpha, percentile,
+                                   get_table)
         
         # get the preamble
         # info abour RSR
@@ -263,8 +264,8 @@ class BaseRSRFitResults:
               '=' * 80,
               sep='\n')
 
-        # return None
-        return None
+        # return table or None
+        return summary_table if self.get_table else None
     
     
     #%% non-user in-class functions
@@ -430,7 +431,8 @@ class BaseRSRFitResults:
                 
         
     # function for summary inputs checks
-    def _check_summary_inputs(self, yname, xname, title, alpha, percentile):
+    def _check_summary_inputs(self, yname, xname, title, alpha, percentile,
+                              get_table):
         """Input checks for the .summary() function."""
         
         # check name for y
@@ -501,7 +503,16 @@ class BaseRSRFitResults:
         else:
             # raise value error
             raise ValueError("percentile must be of type boolean"
-                             ", got %s" % percentile)
+                             ", got %s" % type(percentile))
+        
+        # check whether to return table or not
+        if isinstance(get_table, bool):
+            # assign to self
+            self.get_table = get_table
+        else:
+            # raise value error
+            raise ValueError("get_table must be of type boolean"
+                             ", got %s" % type(get_table))
 
 
 # define BaseAnnealResults class
@@ -655,14 +666,15 @@ class BaseRSRAnnealResults:
     # function to plot annealing sensitivity
     def plot(self,
              xname=None, title=None, alpha=0.05, percentile=False, color=None,
-             path=None, figsize=None, ylim=None, xlabel=None, dpi=None):
+             path=None, figsize=None, ylim=None, xlabel=None, dpi=None,
+             fname=None):
         """
         RSR Annealing Sensitivity Plot.
         """
         
         # check inputs for plot
         self._check_plot_inputs(
-            xname, title, color, path, figsize, ylim, xlabel, dpi)
+            xname, title, color, path, figsize, ylim, xlabel, dpi, fname)
         
         # set resolution
         plt.rcParams['figure.dpi'] = self.dpi
@@ -729,8 +741,12 @@ class BaseRSRAnnealResults:
             # save plot
             if not self.path is None:
                 # save plot
-                fig.savefig(self.path + '/' + var_name + '_annealing.png',
-                            bbox_inches='tight')
+                if not self.fname is None:
+                    fig.savefig(self.path + '/' + self.fname,
+                                bbox_inches='tight')
+                else:
+                    fig.savefig(self.path + '/' + var_name + '_annealing.png',
+                                bbox_inches='tight')
             
             # save figure
             figures[var_name] = (fig, ax)
@@ -805,7 +821,7 @@ class BaseRSRAnnealResults:
     
     # fucntion to check inputs for plot function
     def _check_plot_inputs(self, xname, title, color, path, figsize, ylim,
-                           xlabel, dpi):
+                           xlabel, dpi, fname):
         """Input checks for the .plot() function."""
         
         # check xname
@@ -851,6 +867,19 @@ class BaseRSRAnnealResults:
             # raise value error
             raise ValueError("path must be a string"
                              ", got %s" % type(path))
+        
+        # check fname for plot
+        if fname is None:
+            # set default as None
+            self.fname = None
+        # if supplied check if its valid
+        elif isinstance(fname, str):
+            # set value to user supplied
+            self.fname = fname
+        else:
+            # raise value error
+            raise ValueError("fname must be a string"
+                             ", got %s" % type(fname))
         
         # check path for the plot
         if figsize is None:
@@ -1085,16 +1114,17 @@ class BaseRSRScoreResults:
 
 
     # %% in-class functions
-    # function to plot annealing sensitivity
-    def plot(self,yname=None, xname=None, title=None, cmap=None, path=None,
-             figsize=None, s=None, ylim=None, xlabel=None, dpi=None):
+    # function to plot reliability scores
+    def plot(self, yname=None, xname=None, title=None, cmap=None, path=None,
+             figsize=None, s=None, ylim=None, xlabel=None, dpi=None,
+             fname=None):
         """
         RSR Reliability Scores Plot.
         """
         
         # check inputs for plot
         self._check_plot_inputs(yname, xname, title, cmap, path, figsize, s,
-                                ylim, xlabel, dpi)
+                                ylim, xlabel, dpi, fname)
         
         # set resolution
         plt.rcParams['figure.dpi'] = self.dpi
@@ -1142,8 +1172,12 @@ class BaseRSRScoreResults:
             # save plot
             if not self.path is None:
                 # save plot
-                fig.savefig(self.path + '/' + var_name + '_scores.png',
-                            bbox_inches='tight')
+                if not self.fname is None:
+                    fig.savefig(self.path + '/' + self.fname,
+                                bbox_inches='tight')
+                else:
+                    fig.savefig(self.path + '/' + var_name + '_scores.png',
+                                bbox_inches='tight')
             
             # save figure
             figures[var_name] = (fig, ax, plot)
@@ -1163,7 +1197,7 @@ class BaseRSRScoreResults:
 
     # check inputs for score plot
     def _check_plot_inputs(self, yname, xname, title, cmap, path, figsize, s,
-                           ylim, xlabel, dpi):
+                           ylim, xlabel, dpi, fname):
         """Input checks for the .plot() function."""
         
         # check name for y
@@ -1222,6 +1256,19 @@ class BaseRSRScoreResults:
             # raise value error
             raise ValueError("path must be a string"
                              ", got %s" % type(path))
+        
+        # check fname for plot
+        if fname is None:
+            # set default as None
+            self.fname = None
+        # if supplied check if its valid
+        elif isinstance(fname, str):
+            # set value to user supplied
+            self.fname = fname
+        else:
+            # raise value error
+            raise ValueError("fname must be a string"
+                             ", got %s" % type(fname))
         
         # check path for the plot
         if figsize is None:

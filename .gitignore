@@ -21,9 +21,8 @@
 /samplefit.egg-info/*
 MANIFEST
 
-# exclude testing files
-samplefit_replication.ipynb
-samplefit_testing.ipynb
+# exclude replication and testing files
+replication/
 
 # exclude data and html files
 data/

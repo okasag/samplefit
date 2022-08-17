@@ -265,7 +265,7 @@ class RSR(BaseRSR):
         return super().score()
 
 
-    def anneal(self, share=0.05, n_boot=None):
+    def anneal(self, share=0.1, n_boot=None):
         """
         Sample annealing based on the reliability scores via the RSR algorithm.
 
@@ -273,7 +273,7 @@ class RSR(BaseRSR):
         ----------
         share : float or NoneType
             Share of sample that gets annealed based on the most unreliable
-            observations. Default is 0.05.
+            observations. Default is 0.1.
         n_boot : int or NoneType
             Number of bootstrap replications for inference. If None specified,
             asymptotic approximation is used for inference instead. For valid
@@ -493,7 +493,8 @@ class RSRFitResults(BaseRSRFitResults):
                 xname=None,
                 title=None,
                 alpha=0.05,
-                percentile=False):
+                percentile=False,
+                get_table=False):
         """
         Summary of the sample fit via the RSR algorithm.
         
@@ -513,6 +514,9 @@ class RSRFitResults(BaseRSRFitResults):
             Percentile method for confidence intervals based on bootstrapping.
             If bootstrapping has not been used for fitting, it is ignored.
             Default is False.
+        get_table : bool
+            If a summary table should be returned or not. If True, a pandas
+            DataFrame with estimation results is returned. Default is False.
 
         Returns
         -------
@@ -559,7 +563,8 @@ class RSRFitResults(BaseRSRFitResults):
             xname=xname,
             title=title,
             alpha=alpha,
-            percentile=percentile
+            percentile=percentile,
+            get_table=get_table
             )
 
 
@@ -599,7 +604,8 @@ class RSRAnnealResults(BaseRSRAnnealResults):
              figsize=None,
              ylim=None,
              xlabel=None,
-             dpi=None):
+             dpi=None,
+             fname=None):
         """
         Plot the Annealing based on the reliability scores via the RSR
         of class `Sample()`.
@@ -635,6 +641,9 @@ class RSRAnnealResults(BaseRSRAnnealResults):
             Label for the x axis for the exog variable. Default is 'xname'.
         dpi : float, int or NoneType
             The resolution for matplotlib scatter plot. Default is 100.
+        fname : str or NoneType
+            Valid figure name to save the plot. If None, generic name is used.
+            Default is None.
             
 
         Returns
@@ -686,7 +695,8 @@ class RSRAnnealResults(BaseRSRAnnealResults):
             figsize=figsize,
             ylim=ylim,
             xlabel=xlabel,
-            dpi=dpi
+            dpi=dpi,
+            fname=fname
             )
     
     
@@ -782,7 +792,8 @@ class RSRScoreResults(BaseRSRScoreResults):
              s=None,
              ylim=None,
              xlabel=None,
-             dpi=None):
+             dpi=None,
+             fname=None):
         """
         Plot the Reliability Scores based on the RSR algorithm.
         
@@ -816,8 +827,10 @@ class RSRScoreResults(BaseRSRScoreResults):
             Label for the x axis for the exog variable. Default is 'xname'.
         dpi : float, int or NoneType
             The resolution for matplotlib scatter plot. Default is 100.
-            
-
+        fname : str or NoneType
+            Valid figure name to save the plot. If None, generic name is used.
+            Default is None.
+    
         Returns
         -------
         Dictionary of matplotlib figures. Prints annealing plots.
@@ -867,5 +880,6 @@ class RSRScoreResults(BaseRSRScoreResults):
             s=s,
             ylim=ylim,
             xlabel=xlabel,
-            dpi=dpi
+            dpi=dpi,
+            fname=fname
             )
