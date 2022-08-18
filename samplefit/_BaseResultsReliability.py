@@ -8,15 +8,15 @@ Definition of Reliability Results Classes and the methods.
 
 """
 
-# import statsmodels and samplefit
+# import statsmodels, matplotlib and samplefit
 import statsmodels
+import matplotlib
 import samplefit.Reliability as Reliability
 
 # import modules
 import numpy as np # (hast to be 1.22.0 at least, due to np.percentile changes)
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib as mpl
 
 # import submodules and functions
 from scipy import stats
@@ -1287,20 +1287,25 @@ class BaseRSRScoreResults:
             # define RdYlGn as default
             self.cmap = 'RdYlGn'
         # check if it is float
-        elif isinstance(cmap, str):
-            # check if its in the available colors maps
-            if cmap in plt.colormaps():
-                # get the user specified values
-                self.cmap = cmap
+        elif isinstance(cmap, (str, matplotlib.colors.ListedColormap)):
+            # if string, check admissibility
+            if isinstance(cmap, str):
+                # check if its in the available colors maps
+                if cmap in plt.colormaps():
+                    # get the user specified values
+                    self.cmap = cmap
+                else:
+                    # raise error
+                    raise ValueError("The 'cmap' argument "
+                                     "must be one of matplotlib color maps."
+                                     ", got %s" % cmap)
             else:
-                # raise error
-                raise ValueError("The 'cmap' argument "
-                                 "must be one of matplotlib color maps."
-                                 ", got %s" % cmap)
+                # get the user specified value
+                    self.cmap = cmap
         else:
             # raise error
-            raise TypeError("The 'cmap' argument must be a string."
-                            ", got %s" % type(cmap))
+            raise TypeError("The 'cmap' argument must be a string or "
+                            "ListedColormap, got %s" % type(cmap))
         
         # check for title
         if title is None:
@@ -1331,7 +1336,7 @@ class BaseRSRScoreResults:
         # check markersize s
         if s is None:
             # set default auto
-            self.s = mpl.rcParams['lines.markersize'] ** 2
+            self.s = matplotlib.rcParams['lines.markersize'] ** 2
         # if supplied check if its valid
         elif isinstance(s, (float, int)):
             # set value to user supplied
