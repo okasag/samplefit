@@ -595,6 +595,7 @@ class RSRAnnealResults(BaseRSRAnnealResults):
 
 
     def plot(self,
+             yname=None,
              xname=None,
              title=None,
              alpha=0.05,
@@ -612,6 +613,8 @@ class RSRAnnealResults(BaseRSRAnnealResults):
         
         Parameters
         ----------
+        yname : str or NoneType
+            Name of the y axis. Default is 'Effect'.
         xname : list, tuple, str or NoneType
             Name or list of names of the exog variables for which parameter
             an annealing plot should be constructed. Must be one of the exog 
@@ -686,6 +689,7 @@ class RSRAnnealResults(BaseRSRAnnealResults):
         ```
         """
         return super().plot(
+            yname=yname,
             xname=xname,
             title=title,
             alpha=alpha,

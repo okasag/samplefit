@@ -665,16 +665,16 @@ class BaseRSRAnnealResults:
     # %% in-class functions
     # function to plot annealing sensitivity
     def plot(self,
-             xname=None, title=None, alpha=0.05, percentile=False, color=None,
-             path=None, figsize=None, ylim=None, xlabel=None, dpi=None,
-             fname=None):
+             yname=None, xname=None, title=None, alpha=0.05, percentile=False,
+             color=None, path=None, figsize=None, ylim=None, xlabel=None,
+             dpi=None, fname=None):
         """
         RSR Annealing Sensitivity Plot.
         """
         
         # check inputs for plot
         self._check_plot_inputs(
-            xname, title, color, path, figsize, ylim, xlabel, dpi, fname)
+            yname, xname, title, color, path, figsize, ylim, xlabel, dpi, fname)
         
         # set resolution
         plt.rcParams['figure.dpi'] = self.dpi
@@ -724,16 +724,12 @@ class BaseRSRAnnealResults:
                                 color=self.color, alpha=.2,
                                 label= str(int((1-self.alpha)*100)) + '% CI')
             
-            # dashed line at zero
-            # plt.axhline(y=0, color='black', linestyle='dashed')
-            
             # add titles, ticks, etc.
             ax.title.set_text(self.title)
             ax.set_xlabel('Sample Share Dropped')
-            ax.set_ylabel('Effect')
-            labels = list(np.arange(0, self.share, 0.01))
-            labels.append(self.share)
-            ticks = np.arange(0, x_width, np.floor(x_width/(len(labels)-1)))
+            ax.set_ylabel(self.yname)
+            labels = list(np.round(np.linspace(0, self.share, 11), 2))
+            ticks = list(np.round(np.linspace(0, x_width, 11), 0))
             plt.xticks(ticks, labels)
             plt.legend(loc="best")
             plt.show()
@@ -820,10 +816,23 @@ class BaseRSRAnnealResults:
     
     
     # fucntion to check inputs for plot function
-    def _check_plot_inputs(self, xname, title, color, path, figsize, ylim,
-                           xlabel, dpi, fname):
+    def _check_plot_inputs(self, yname, xname, title, color, path, figsize,
+                           ylim, xlabel, dpi, fname):
         """Input checks for the .plot() function."""
         
+        # check name for y
+        if yname is None:
+            # set default as 'Effect'
+            self.yname = 'Effect'
+        # if supplied check if its valid
+        elif isinstance(yname, str):
+            # set value to user supplied
+            self.yname = yname
+        else:
+            # raise value error
+            raise ValueError("yname must be a string"
+                             ", got %s" % type(yname))
+
         # check xname
         if xname is None:
             # plot all as default
