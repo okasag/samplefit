@@ -130,16 +130,27 @@ class BaseRSR:
             # if float, then take it as a share
             if isinstance(min_samples, float):
                 # check if its within (0,1]
-                if (min_samples > 0 and min_samples <= 1):
-                    # assign the input value
-                    self.min_samples = int(np.ceil(min_samples * self.n_obs))
+                if (min_samples > 0 and min_samples < 1):
+                    # get the integer value for sampling size
+                    min_samples_int = int(np.ceil(min_samples * self.n_obs))
+                    # check if its within [p,N-1]
+                    if ((min_samples_int >= self.n_exog + 1) and
+                        (min_samples_int <= self.n_obs - 1)):
+                        # assign the input value
+                        self.min_samples = min_samples_int
+                    else:
+                        # raise value error
+                        raise ValueError("min_samples must be within [p+1,N-1]"
+                                         ", increase the min_samples share or "
+                                         "specify number of minimum samples "
+                                         "directly as an integer.")
                 else:
                     # raise value error
-                    raise ValueError("min_samples must be within (0,1]"
+                    raise ValueError("min_samples must be within (0,1)"
                                      ", got %s" % min_samples)
             # if int, then take it as a absolute number
             else:
-                # check if its within [p,N-1]
+                # check if its within [p+1,N-1]
                 if ((min_samples >= self.n_exog + 1) and
                     (min_samples <= self.n_obs - 1)):
                     # assign the input value

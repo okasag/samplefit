@@ -1125,15 +1125,15 @@ class BaseRSRScoreResults:
     # %% in-class functions
     # function to plot reliability scores
     def plot(self, yname=None, xname=None, title=None, cmap=None, path=None,
-             figsize=None, s=None, ylim=None, xlabel=None, dpi=None,
-             fname=None):
+             figsize=None, s=None, ylim=None, xlim=None, xlabel=None, dpi=None,
+             fname=None, jitter=False):
         """
         RSR Reliability Scores Plot.
         """
         
         # check inputs for plot
         self._check_plot_inputs(yname, xname, title, cmap, path, figsize, s,
-                                ylim, xlabel, dpi, fname)
+                                ylim, xlim, xlabel, dpi, fname, jitter)
         
         # set resolution
         plt.rcParams['figure.dpi'] = self.dpi
@@ -1151,19 +1151,50 @@ class BaseRSRScoreResults:
             # define the plot layout
             fig, ax = plt.subplots(nrows=1, ncols=1, figsize = self.figsize)
 
-            # plot scores
-            plot = ax.scatter(x=self.exog[:, var_idx],
-                              y=self.endog,
-                              c=self.scores,
-                              cmap=self.cmap,
-                              s=self.s)
-            # add titles, ticks, etc.
+            # check if X is categorical
+            if np.sum(self.exog[:, var_idx].astype(int) - 
+                      self.exog[:, var_idx]) == 0:
+                # get distinct values
+                cat_values = list(np.sort(np.unique(self.exog[:, var_idx])
+                                          ).astype(int))
+                # check if jitter should be applied
+                if self.jitter:
+                    # apply jitter random noise for visualisation purposes
+                    exog_jitter = (self.exog[:, var_idx].copy() + 
+                                   np.random.uniform(-0.1, 0.1,
+                                                     len(self.endog)))
+                else:
+                    # keep original values
+                    exog_jitter = self.exog[:, var_idx].copy()
+                # scatter plot
+                plot = ax.scatter(x=exog_jitter,
+                                  y=self.endog,
+                                  c=self.scores,
+                                  cmap=self.cmap,
+                                  s=self.s)
+                # plot ticks
+                cat_values.insert(0, (np.min(cat_values) - 0.5))
+                cat_values.append((np.max(cat_values) + 0.5))
+                ticks = cat_values.copy()
+                # add ticks
+                plt.xticks(ticks, cat_values)
+            else:
+                # scatter plot
+                plot = ax.scatter(x=self.exog[:, var_idx],
+                                  y=self.endog,
+                                  c=self.scores,
+                                  cmap=self.cmap,
+                                  s=self.s)
+
+            # add titles, labels, etc.
             ax.title.set_text(self.title)
             ax.set_xlabel(self.xlabel[iter_idx])
             ax.set_ylabel(self.yname)
             # set limits if specified
             if not self.ylim is None:
                 ax.set_ylim(self.ylim)
+            if not self.xlim is None:
+                ax.set_xlim(self.xlim)
             # add legend
             legend = ax.legend(*plot.legend_elements(),
                                title="Reliability Score",
@@ -1206,7 +1237,7 @@ class BaseRSRScoreResults:
 
     # check inputs for score plot
     def _check_plot_inputs(self, yname, xname, title, cmap, path, figsize, s,
-                           ylim, xlabel, dpi, fname):
+                           ylim, xlim, xlabel, dpi, fname, jitter):
         """Input checks for the .plot() function."""
         
         # check name for y
@@ -1342,6 +1373,19 @@ class BaseRSRScoreResults:
             raise ValueError("ylim must be a tuple or a list"
                              ", got %s" % type(ylim))
         
+        # check name for xlim
+        if xlim is None:
+            # set default auto
+            self.xlim = xlim
+        # if supplied check if its valid
+        elif isinstance(xlim, (tuple, list)):
+            # set value to user supplied
+            self.xlim = xlim
+        else:
+            # raise value error
+            raise ValueError("xlim must be a tuple or a list"
+                             ", got %s" % type(xlim))
+        
         # check markersize s
         if s is None:
             # set default auto
@@ -1396,3 +1440,12 @@ class BaseRSRScoreResults:
             # raise value error
             raise ValueError("dpi must be float or int"
                              ", got %s" % type(dpi))
+        
+        # check jitter
+        if isinstance(jitter, bool):
+            # assign value
+            self.jitter = jitter
+        else:
+            # raise value error
+            raise ValueError("jitter must be boolean"
+                             ", got %s" % type(jitter))

@@ -795,9 +795,11 @@ class RSRScoreResults(BaseRSRScoreResults):
              figsize=None,
              s=None,
              ylim=None,
+             xlim=None,
              xlabel=None,
              dpi=None,
-             fname=None):
+             fname=None,
+             jitter=False):
         """
         Plot the Reliability Scores based on the RSR algorithm.
         
@@ -827,6 +829,8 @@ class RSRScoreResults(BaseRSRScoreResults):
             Default is automatic.
         ylim : tuple, list or NoneType
             Tuple of upper and lower limits of y axis. Default is automatic.
+        xlim : tuple, list or NoneType
+            Tuple of upper and lower limits of x axis. Default is automatic.
         xlabel : str or NoneType
             Label for the x axis for the exog variable. Default is 'xname'.
         dpi : float, int or NoneType
@@ -834,16 +838,20 @@ class RSRScoreResults(BaseRSRScoreResults):
         fname : str or NoneType
             Valid figure name to save the plot. If None, generic name is used.
             Default is None.
+        jitter : bool
+            Logical, if scatterplot should be jittered for categorical
+            features. Note, that this involves random perturbation of the
+            values of features along X axis, fixing seed is thus necessary for
+            reproducibility. Default is False.
     
         Returns
         -------
-        Dictionary of matplotlib figures. Prints annealing plots.
+        Dictionary of matplotlib figures. Prints scoring plots.
 
         Notes
         -----
-        [`.plot()`](#samplefit.Reliability.RSRAnnealResults.plot) produces
-        an annealing plot for assessment of sample fit sensitivity, together
-        with parameters and confidence intervals.
+        [`.plot()`](#samplefit.Reliability.RSRScoreResults.plot) produces
+        a scoring plot for assessment of sample fit reliability.
 
         Examples
         --------
@@ -864,14 +872,14 @@ class RSRScoreResults(BaseRSRScoreResults):
         # specify sample
         sample = sf.RSR(linear_model=model)
         
-        # sample annealing
-        sample_annealing = sample.anneal()
+        # sample reliability
+        sample_scores = sample.score()
         
-        # default annealing plot
-        sample_annealing.plot()
+        # default scoring plot
+        sample_scores.plot()
         
-        # custom annealing
-        sample_annealing.plot(title='My Title')
+        # custom scoring
+        sample_scores.plot(title='My Title')
         ```
         """
         return super().plot(
@@ -883,7 +891,9 @@ class RSRScoreResults(BaseRSRScoreResults):
             figsize=figsize,
             s=s,
             ylim=ylim,
+            xlim=xlim,
             xlabel=xlabel,
             dpi=dpi,
-            fname=fname
+            fname=fname,
+            jitter=jitter
             )
