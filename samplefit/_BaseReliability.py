@@ -37,7 +37,6 @@ class BaseRSR:
                  n_samples=1000,
                  min_samples=None,
                  loss=None,
-                 boost=None,
                  n_jobs=-1,
                  random_state=None):
 
@@ -46,7 +45,6 @@ class BaseRSR:
         self.n_samples = n_samples
         self.min_samples = min_samples
         self.loss = loss
-        self.boost = boost
         self.n_jobs = n_jobs
         self.random_state = random_state
         
@@ -62,7 +60,6 @@ class BaseRSR:
         n_samples = self.n_samples
         min_samples = self.min_samples
         loss = self.loss
-        boost = self.boost
         n_jobs = self.n_jobs
         random_state = self.random_state
 
@@ -192,25 +189,6 @@ class BaseRSR:
             raise ValueError("Input for 'loss' must be a string"
                              ", got %s" % loss)
 
-        # if boosting should be applied
-        if boost is None:
-            # set None as default, no boosting performed
-            self.boost = None
-        # otherwise check the percentage of boosting
-        elif isinstance(boost, float):
-            # check if its within (0,1)
-            if (boost >= 0 and boost < 1):
-                # assign the input value
-                self.boost = int(np.ceil(boost * self.n_obs))
-            else:
-                # raise value error
-                raise ValueError("boost must be within [0,1)"
-                                 ", got %s" % boost)
-        else:
-            # raise value error
-            raise ValueError("boost must be a float"
-                             ", got %s" % boost)
-
         # check whether n_jobs is integer
         if isinstance(n_jobs, int):
             # check max available physical cores
@@ -273,21 +251,12 @@ class BaseRSR:
         # restore bootstrapping
         self.n_boot = None
         
-        # check if boosting should be performed
-        if self.boost is None:
-            # run the standard RSR algorithm to estimate reliability scores  
-            rsr_scores = self._estimate_scores(endog=self.endog,
-                                               exog=self.exog,
-                                               n_samples=self.n_samples,
-                                               min_samples=self.min_samples,
-                                               loss=self.loss_function)
-        else:
-            # run the boosted RSR algorithm to estimate reliability scores  
-            rsr_scores = self._estimate_boosted_scores(endog=self.endog,
-                                                       exog=self.exog,
-                                                       n_samples=self.n_samples,
-                                                       min_samples=self.min_samples,
-                                                       loss=self.loss_function)
+        # run the RSR algorithm to estimate reliability scores  
+        rsr_scores = self._estimate_scores(endog=self.endog,
+                                           exog=self.exog,
+                                           n_samples=self.n_samples,
+                                           min_samples=self.min_samples,
+                                           loss=self.loss_function)
         
         # compute gini coefficient of the scores
         self.gini = self._gini_coef(rsr_scores)
@@ -300,31 +269,23 @@ class BaseRSR:
     
     
     # %% fit
-    # function to fit the linear model: weighted or consensus fit
-    def fit(self, weights=None, consensus=None, n_boot=None):
+    # function to fit the linear model via weighted least squares
+    def fit(self, weights=None, n_boot=None):
         """
-        RSR fit, either weighted or consensus estimation.
+        RSR weighted fit.
 
         """
 
         # check fit inputs
-        rsr_scores = self._check_fit_inputs(weights, consensus, n_boot)
+        rsr_scores = self._check_fit_inputs(weights, n_boot)
         
         # compute gini coefficient of the scores
         self.gini = self._gini_coef(rsr_scores)
         
-        # fit the reliable model: either weighted fit or consensus fit
-        if self.weighted:
-            # weighted fit
-            betas = self._weighted_fit(endog=self.endog,
-                                       exog=self.exog,
-                                       scores=self.weights)
-        else:
-            # consensus fit
-            betas, threshold, inliers, outliers = self._consensus_fit(
-                endog=self.endog,
-                exog=self.exog,
-                scores=rsr_scores)
+        # fit the reliable model: weighted fit
+        betas = self._weighted_fit(endog=self.endog,
+                                   exog=self.exog,
+                                   scores=self.weights)
         
         # get fitted values and residuals
         fittedvalues = np.dot(self.exog, betas)
@@ -334,8 +295,7 @@ class BaseRSR:
         if self.n_boot is None:
             # asymptotic approximation
             betas_se, boot_betas = self._asym_se(residuals=resid,
-                                                 weights=self.weights,
-                                                 weighted=self.weighted)
+                                                 weights=self.weights)
         else:
             # bootstrap approximation
             betas_se, boot_betas = self._boot_se()
@@ -485,96 +445,6 @@ class BaseRSR:
         
         # return the individual sample loss
         return loss_value
-
-
-    # function to estimate the boosted reliability scores
-    def _estimate_boosted_scores(self,
-                                 endog, exog, n_samples, min_samples, loss):
-        """Estimate the reliability scores via boosted RSR algorithm."""
-    
-        # boost the RSR algorithm
-        boost_drops = []
-        boost_indices = np.arange(self.n_obs, dtype=int)
-        
-        # start annealing
-        for drop_idx in range(self.boost):
-    
-            
-            #in_idx = np.setdiff1d(np.arange(self.n_obs, dtype=int),
-            #                      boost_drops)
-            endog_boost = self.endog[boost_indices]
-            exog_boost = self.exog[boost_indices, :]
-    
-            # run the standard RSR algorithm to estimate reliability scores  
-            rsr_scores = self._estimate_scores(endog=endog_boost,
-                                               exog=exog_boost,
-                                               n_samples=self.n_samples,
-                                               min_samples=self.min_samples,
-                                               loss=self.loss_function)
-        
-            # identify the most unreliable observation
-            most_unreliable = int(np.where(rsr_scores == 0)[0])
-            # add it to drop indices
-            boost_drops.append(boost_indices[most_unreliable])
-            # get updated sample, without the least reliable score
-            boost_indices = np.delete(boost_indices, most_unreliable)
-            
-        # estimate boosted rsr scores now for all observations 
-        # controls for the optimization
-        iter_loss_value = {}
-        sample_idx = 0
-        
-        # start sampling loop
-        while sample_idx < n_samples:
-            
-            # initiate loss vector with NAs
-            loss_value = np.empty(len(endog))
-            loss_value[:] = np.nan
-    
-            # subsample data without replacement
-            # get in bag indices from the reliable part of the sample
-            in_idx = np.random.choice(boost_indices, size=min_samples,
-                                      replace=False)
-            # get out of bag indices
-            oob_idx = np.setdiff1d(boost_indices, in_idx)
-            # plus out-of-sample indices (unreliable part of the sample)
-            out_idx = np.insert(oob_idx, 0, boost_drops)
-            
-            # in bag observations
-            endog_in = endog[in_idx]
-            exog_in = exog[in_idx, :]
-            # out of bag plus out of sample observations
-            endog_out = endog[out_idx]
-            exog_out = exog[out_idx, :]
-            
-            # check if the sample is valid
-            if self._is_sample_valid(exog_in):
-                # update sample_idx
-                sample_idx +=1
-            else:
-                # continue with new draw
-                continue
-    
-            # estimate the betas
-            betas = np.linalg.inv(exog_in.T @ exog_in) @ (exog_in.T @ endog_in)
-            # predict out-of-sample
-            out_pred = exog_out @ betas
-            # evaluate the error for out-of-sample observations
-            loss_value[out_idx] = loss(endog_out, out_pred)
-            # save the results
-            iter_loss_value[sample_idx] = loss_value
-        
-        # resampling loss: rows are observations, columns are iterations
-        resampling_loss = pd.DataFrame(iter_loss_value)
-        # average over the losses row-wise
-        average_loss = np.array(resampling_loss.mean(axis=1))
-        # reverse the relationship and scale between 0 and 1 for scores
-        # take absolute value to prevent -0
-        scores = np.abs((average_loss - np.max(average_loss))/
-                        (np.min(average_loss) - np.max(average_loss)))
-        
-        # return the reliability scores
-        return scores
     
     
     # function to compute gini coefficient for reliability scores
@@ -593,7 +463,7 @@ class BaseRSR:
         return gini
 
 
-    # function to chekc if sampled data is valid
+    # function to check if sampled data is valid
     def _is_sample_valid(self, matrix=None):
         """Check if sampled covariate matrix has full rank."""
         
@@ -613,22 +483,15 @@ class BaseRSR:
 
     
     # function to estimate the standard errors via asymptotic approximation
-    def _asym_se(self, residuals=None, weights=None, weighted=None):
+    def _asym_se(self, residuals=None, weights=None):
         """Estimate the standard errors via asymptotics."""
         
-        # check if weighted or consensus fit and compute matrix accordingly
-        if weighted:
-            # compute weight matrix
-            W_matrix = np.diag(weights)
-            # compute (x'wx)-1
-            x_inv = np.linalg.inv(self.exog.T @ W_matrix @ self.exog)
-            # compute sum of squared residuals
-            sigma_sq = (residuals.T @ W_matrix @ residuals)
-        else:
-            # compute (x'x)-1
-            x_inv = np.linalg.inv(np.dot(self.exog.T, self.exog))
-            # compute sum of squared residuals
-            sigma_sq = np.dot(residuals.T, residuals)
+        # compute weight matrix
+        W_matrix = np.diag(weights)
+        # compute (x'wx)-1
+        x_inv = np.linalg.inv(self.exog.T @ W_matrix @ self.exog)
+        # compute sum of squared residuals
+        sigma_sq = (residuals.T @ W_matrix @ residuals)
         
         # compute se as (sqrt diag((u'u)(x'x)^(-1)/(N-p))
         betas_se = np.sqrt(np.diagonal(
@@ -709,41 +572,25 @@ class BaseRSR:
         exog_in = self.exog[in_idx, :]
 
         # estimate the scores
-        if self.boost is None:
-            # estimate standard scores
-            scores_idx = self._estimate_scores(endog=endog_in,
-                                               exog=exog_in,
-                                               n_samples=self.n_samples,
-                                               min_samples=self.min_samples,
-                                               loss=self.loss_function)
-        else:
-            # run the boosted RSR algorithm to estimate reliability scores  
-            scores_idx = self._estimate_boosted_scores(endog=endog_in,
-                                                       exog=exog_in,
-                                                       n_samples=self.n_samples,
-                                                       min_samples=self.min_samples,
-                                                       loss=self.loss_function)
+        scores_idx = self._estimate_scores(endog=endog_in,
+                                           exog=exog_in,
+                                           n_samples=self.n_samples,
+                                           min_samples=self.min_samples,
+                                           loss=self.loss_function)
         
         # check if bootstrap should be used for annealing
         if not anneal:
-            # fit the reliable model: either weighted fit or consensus fit
-            if self.weighted:
-                # get weights
-                if not self.user_weights:
-                    # default squared weights (reflected in inference)
-                    weights_idx = scores_idx ** 2
-                else:
-                    # user-supplied weights (not reflected in inference)
-                    weights_idx = self.weights[in_idx]
-                # weighted fit (1 x n_params)
-                betas_idx = self._weighted_fit(endog=endog_in,
-                                               exog=exog_in,
-                                               scores=weights_idx)
+            # fit the reliable model: weighted fit
+            if not self.user_weights:
+                # default squared weights (reflected in inference)
+                weights_idx = scores_idx ** 2
             else:
-                # consensus fit (1 x n_params)
-                betas_idx = self._consensus_fit(endog=endog_in,
-                                                exog=exog_in,
-                                                scores=scores_idx)[0]
+                # user-supplied weights (not reflected in inference)
+                weights_idx = self.weights[in_idx]
+            # weighted fit (1 x n_params)
+            betas_idx = self._weighted_fit(endog=endog_in,
+                                           exog=exog_in,
+                                           scores=weights_idx)
         # otherwise do the annealing fit
         else:
             # get the annealing fit (n_drop+1 x n_params)
@@ -767,41 +614,6 @@ class BaseRSR:
                  (exog.T @ W_matrix @ endog))
         # return betas
         return betas
-
-
-    # Function for threshold estimation
-    def _threshold(self, scores):
-        """Threshold based on reliability scores."""
-        
-        # fit the threshold by the largest change in the slope of the scores
-        scores_sorted = np.sort(scores)
-        # take double diff for each sorted observation (derivative approx)
-        scores_sorted_diff = np.diff(np.diff(scores_sorted))
-        # get the index of the largest slope change shift index by 1 due to the
-        # central differences to get the index of point where the biggest
-        # change starts (including that point)
-        max_slope_idx = np.argmin(scores_sorted_diff) + 1
-        # get the error threshold for oultiers
-        threshold = scores_sorted[max_slope_idx]
-        # return threshold
-        return threshold
-
-
-    # Function for consensus fit
-    def _consensus_fit(self, endog, exog, scores):
-        """Consensus fit based on reliability scores."""
-
-        # estimate threshold
-        threshold = self._threshold(scores=scores)
-        # get inliers
-        inliers = (scores >= threshold)
-        # get outliers
-        outliers = (scores < threshold)
-        # estimate consensus fit
-        betas = (np.linalg.inv(exog[inliers].T @ exog[inliers]) @
-                 (exog[inliers].T @ endog[inliers]))
-        # return betas, threshold, in and outlier mask
-        return betas, threshold, inliers, outliers
     
     
     # Function for annealing fit
@@ -863,20 +675,11 @@ class BaseRSR:
         # check if reliability scores have been fitted already
         if self.scores is None:
             # estimate the reliability scores first
-            if self.boost is None:
-                # run the standard RSR algorithm to estimate reliability scores 
-                rsr_scores = self._estimate_scores(endog=self.endog,
-                                                   exog=self.exog,
-                                                   n_samples=self.n_samples,
-                                                   min_samples=self.min_samples,
-                                                   loss=self.loss_function)
-            else:
-                # run the boosted RSR algorithm to estimate reliability scores  
-                rsr_scores = self._estimate_boosted_scores(endog=self.endog,
-                                                           exog=self.exog,
-                                                           n_samples=self.n_samples,
-                                                           min_samples=self.min_samples,
-                                                           loss=self.loss_function)
+            rsr_scores = self._estimate_scores(endog=self.endog,
+                                               exog=self.exog,
+                                               n_samples=self.n_samples,
+                                               min_samples=self.min_samples,
+                                               loss=self.loss_function)
             # and assign scores to self
             self.scores = rsr_scores
         else:
@@ -888,7 +691,7 @@ class BaseRSR:
     
     
     # function for fit inputs checks
-    def _check_fit_inputs(self, weights, consensus, n_boot):
+    def _check_fit_inputs(self, weights, n_boot):
         """Input checks for the .fit() function."""
         
         # check if bootstrapping or asymptotic inference should be done
@@ -936,45 +739,6 @@ class BaseRSR:
             # raise value error
             raise ValueError("weight must be of type numpy array"
                              ", got %s" % type(weights))
-
-        # define consensus methods
-        consensus_methods = ['second_derivative']
-        # check the consensu fit
-        if consensus is None:
-            # no consensus fit performed
-            self.consensus = None
-        elif isinstance(consensus, str):
-            # check admissible options
-            if consensus in consensus_methods:
-                # perform consensus fit according to second derivative rule
-                self.consensus == 'second_derivative'
-            else:
-                # raise value error
-                raise ValueError("consensus must be one of " +
-                                 str(consensus_methods) + ""
-                                 ", got %s" % consensus)
-        else:
-            # raise value error
-            raise ValueError("consensus must be NoneType or string "
-                             ", got %s" % type(consensus))
-        
-        # decide if weighted or consesus fit gets estimated
-        if (weights is None and consensus is None):
-            # then perform weighted fit with RSR scores
-            self.weighted = True
-        elif (weights is not None and consensus is None):
-            # then perform weighted fit with supplied weights
-            self.weighted = True
-        elif (weights is None and consensus is not None):
-            # then perform consensus fit with supplied method
-            self.weighted = False
-        elif (weights is not None and consensus is not None):
-            # then perform weighted fit with supplied weights
-            self.weighted = True
-        else:
-            # raise value error
-            raise ValueError("weights and consensus are not compatible, "
-                             "check the documentation.")
             
         # return rsr scores
         return rsr_scores

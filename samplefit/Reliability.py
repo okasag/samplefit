@@ -36,14 +36,6 @@ class RSR(BaseRSR):
         either 'squared_error' or 'absolute_error'. For a user defined loss
         function, user can directly supply own lambda function of type:
         'lambda y, yhat:'. Default is 'absolute_error'.
-    boost : float or NoneType
-        Share of sample that should be boosted, i.e. the share of observations
-        that is sequentially dropped from the sample based on the iteratively
-        lowest reliability scores. The final boosted reliability scores are
-        then estimated based on the boosted sample that excludes boost \% of
-        the most unreliable observations from the sample. Boosting should be
-        applied only when there is a prior knowledge of the outlier share.
-        The default is None.
     n_jobs : int or NoneType
         The number of parallel jobs to be used for multithreading in
         [`.fit()`](#samplefit.Reliability.RSR.fit),
@@ -52,7 +44,7 @@ class RSR(BaseRSR):
         Follows
         [`joblib`](https://joblib.readthedocs.io){:target="_blank"} semantics:
 
-        - `n_jobs=-1` means all - 1 available cpu cores.
+        - `n_jobs=-1` means all - 1 available cpu physical cores.
         - `n_jobs=None` and `n_jobs=1` means no parallelism.
 
         The default is -1.
@@ -115,7 +107,6 @@ class RSR(BaseRSR):
                  n_samples=1000,
                  min_samples=None,
                  loss=None,
-                 boost=None,
                  n_jobs=-1,
                  random_state=None):
         # access inherited methods
@@ -124,7 +115,6 @@ class RSR(BaseRSR):
             n_samples=n_samples,
             min_samples=min_samples,
             loss=loss,
-            boost=boost,
             n_jobs=n_jobs,
             random_state=random_state
         )
@@ -132,7 +122,6 @@ class RSR(BaseRSR):
 
     def fit(self,
             weights=None,
-            consensus=None,
             n_boot=None):
         """
         Sample fit based on the reliability scores via the RSR algorithm.
@@ -144,12 +133,6 @@ class RSR(BaseRSR):
             reliability scores will be used as weights as a default. Note, that
             if bootstrapping is used for inference, the estimation of
             user-supplied weights is not reflected. Default is None.
-        consensus : str or NoneType
-            Type of optimization for consensus fit. Currently only
-            'second_derivative' is supported. If None, weighted fit is
-            performed. For consensus fit, set consensus='second_derivative' and
-            weights=None. In all other cases, weighted fit is performed.
-            Default is None.
         n_boot : int or NoneType
             Number of bootstrap replications for inference. If None specified,
             asymptotic approximation is used for inference instead. For valid
@@ -190,9 +173,6 @@ class RSR(BaseRSR):
         # sample fit with defaults
         sample_fit = sample.fit()
         
-        # sample fit with consensus
-        sample_fit = sample.fit(consensus='second_derivative')
-        
         # sample fit with bootstrapping
         sample_fit = sample.fit(n_boot=1000)
         
@@ -208,7 +188,6 @@ class RSR(BaseRSR):
         """
         return super().fit(
             weights=weights,
-            consensus=consensus,
             n_boot=n_boot
             )
 
@@ -369,8 +348,8 @@ class RSRFitResults(BaseRSRFitResults):
         ----------
         params : array-like or NoneType
             Array of parameters to predict with. If None supplied, the
-            estimated parameters from the sample fit (weighted or consensus)
-            will be used. Default is None.
+            estimated parameters from the sample fit will be used.
+            Default is None.
         exog : array-like or NoneType
             Matrix of features/covariates for which the outcomes should be
             predicted (out-of-sample). Column dimensions must be identical
@@ -386,9 +365,9 @@ class RSRFitResults(BaseRSRFitResults):
         -----
         [`.predict()`](#samplefit.Reliability.RSRFitResults.predict) constructs
         predictions for outcome variable based on the estimated parameters.
-        Predictions are based on the parameters of weighted fit or consensus
-        fit, depending on the prior .fit() specification. If no new values for
-        exogeneous variables are supplied, fitted values are returned.
+        Predictions are based on the parameters of weighted fit. If no new
+        values for exogeneous variables are supplied, fitted values are
+        returned.
 
         Examples
         --------

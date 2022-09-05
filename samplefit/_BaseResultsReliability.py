@@ -151,7 +151,6 @@ class BaseRSRFitResults:
         # get the class inputs
         self.min_samples = self.sample.min_samples
         self.loss = self.sample.loss
-        self.boost = self.sample.boost
         self.n_boot = self.sample.n_boot
         self.weights = self.sample.weights
 
@@ -170,7 +169,7 @@ class BaseRSRFitResults:
 
 
     # %% in-class functions
-    # function to predict yhats based on the weighted or consensus fit
+    # function to predict yhats based on the weighted fit
     def predict(self, params=None, exog=None):
         """
         RSR prediction after fit.
@@ -653,7 +652,6 @@ class BaseRSRAnnealResults:
         # get the class inputs
         self.min_samples = self.sample.min_samples
         self.loss = self.sample.loss
-        self.boost = self.sample.boost
         self.share = self.sample.share
         self.n_boot = self.sample.n_boot
 
@@ -1115,7 +1113,6 @@ class BaseRSRScoreResults:
         # get the class inputs
         self.min_samples = self.sample.min_samples
         self.loss = self.sample.loss
-        self.boost = self.sample.boost
 
         # get the scores and compute gini coef
         self.scores = self.sample.scores
