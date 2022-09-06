@@ -20,7 +20,6 @@ import matplotlib.pyplot as plt
 
 # import submodules and functions
 from scipy import stats
-# TODO: from joblib import Parallel, delayed, parallel_backend
 from multiprocessing import cpu_count, Lock
 from matplotlib.colors import is_color_like
 # TODO: add check_random_state from statsmodels 0.14.0
@@ -274,9 +273,9 @@ class BaseRSRFitResults:
         
         # compute confidence intervals via asymptotics
         # take lower tail
-        lower_ci = betas - stats.norm.ppf(1-alpha/2) * betas_se
+        lower_ci = betas - stats.t.ppf(1-alpha/2, self.df_resid) * betas_se
         # take upper tail
-        upper_ci = betas + stats.norm.ppf(1-alpha/2) * betas_se
+        upper_ci = betas + stats.t.ppf(1-alpha/2, self.df_resid) * betas_se
                 
         # return confidence intervals
         return lower_ci, upper_ci
@@ -334,11 +333,11 @@ class BaseRSRFitResults:
                                                           method='closest_observation',
                                                           axis=0)
         else:
-            # take bootstrap std as approxamition of standard error
+            # take bootstrap std as approximation of standard error
             # take lower tail
-            lower_ci = betas - stats.norm.ppf(1-alpha/2) * betas_se
+            lower_ci = betas - stats.t.ppf(1-alpha/2, self.df_resid) * betas_se
             # take upper tail
-            upper_ci = betas + stats.norm.ppf(1-alpha/2) * betas_se
+            upper_ci = betas + stats.t.ppf(1-alpha/2, self.df_resid) * betas_se
                 
         # return confidence intervals
         return lower_ci, upper_ci
@@ -648,6 +647,7 @@ class BaseRSRAnnealResults:
         self.exog_names = self.sample.exog_names
         self.n_obs = int(self.sample.n_obs)
         self.n_exog = self.sample.n_exog
+        self.df_resid = self.n_obs - self.n_exog
         
         # get the class inputs
         self.min_samples = self.sample.min_samples
@@ -996,9 +996,9 @@ class BaseRSRAnnealResults:
         
         # compute confidence intervals via asymptotics
         # take lower tail
-        lower_ci = betas - stats.norm.ppf(1-alpha/2) * betas_se
+        lower_ci = betas - stats.t.ppf(1-alpha/2, self.df_resid) * betas_se
         # take upper tail
-        upper_ci = betas + stats.norm.ppf(1-alpha/2) * betas_se
+        upper_ci = betas + stats.t.ppf(1-alpha/2, self.df_resid) * betas_se
                 
         # return confidence intervals
         return lower_ci, upper_ci
@@ -1058,9 +1058,9 @@ class BaseRSRAnnealResults:
         else:
             # take bootstrap std as approxamition of standard error
             # take lower tail
-            lower_ci = betas - stats.norm.ppf(1-alpha/2) * betas_se
+            lower_ci = betas - stats.t.ppf(1-alpha/2, self.df_resid) * betas_se
             # take upper tail
-            upper_ci = betas + stats.norm.ppf(1-alpha/2) * betas_se
+            upper_ci = betas + stats.t.ppf(1-alpha/2, self.df_resid) * betas_se
                 
         # return confidence intervals
         return lower_ci, upper_ci

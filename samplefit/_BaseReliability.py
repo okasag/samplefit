@@ -17,7 +17,6 @@ import numpy as np # (hast to be 1.22.0 at least, due to np.percentile changes)
 import pandas as pd
 
 # import submodules and functions
-from scipy import stats
 from joblib import Parallel, delayed, parallel_backend
 from psutil import cpu_count
 # TODO: add check_random_state from statsmodels 0.14.0
