@@ -17,7 +17,7 @@ setup(
   author = 'Gabriel Okasa and Kenneth A. Younge',
   author_email = 'okasa.gabriel@gmail.com',
   url = 'https://github.com/okasag/samplefit',
-  download_url = 'https://github.com/okasag/samplefit/archive/refs/tags/v0.3.1.tar.gz',
+  download_url = 'https://github.com/okasag/samplefit/archive/v0.3.1.tar.gz',
   keywords = ['sample fit', 'reliability', 'econometrics'],
   install_requires=[
           'numpy>=1.22.0',

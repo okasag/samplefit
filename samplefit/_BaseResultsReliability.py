@@ -232,7 +232,7 @@ class BaseSFRFitResults:
                    np.round(self.rsquared, 4)]
         
         # get header for table
-        header = ['Coef.', 'Std.Err.', 't', 'P>|t|',
+        header = ['coef', 'std err', 't', 'P>|t|',
                   '[' + str(alpha/2), str(1-alpha/2) + ']']
         # compute conf int
         ci_low, ci_up = self.conf_int(alpha=self.alpha,

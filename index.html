@@ -1691,7 +1691,8 @@ Initializes output of SFR.fit().</p></div>
                 title=None,
                 alpha=0.05,
                 percentile=False,
-                get_table=False):
+                get_table=False,
+                verbose=True):
         &#34;&#34;&#34;
         Summary of the sample fit via the SFR algorithm.
         
@@ -1713,6 +1714,9 @@ Initializes output of SFR.fit().</p></div>
         get_table : bool
             If a summary table should be returned or not. If True, a pandas
             DataFrame with estimation results is returned. Default is False.
+        verbose : bool
+            If a summary table should be printed to console or not.
+            Default is True.
 
         Returns
         -------
@@ -1760,7 +1764,8 @@ Initializes output of SFR.fit().</p></div>
             title=title,
             alpha=alpha,
             percentile=percentile,
-            get_table=get_table
+            get_table=get_table,
+            verbose=verbose
             )</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -2008,7 +2013,7 @@ preds = sample_fit.predict(exog=X[0, :])
 </details>
 </dd>
 <dt id="samplefit.SFRFitResults.summary"><code class="name flex">
-<span>def <span class="ident">summary</span></span>(<span>self, yname=None, xname=None, title=None, alpha=0.05, percentile=False, get_table=False)</span>
+<span>def <span class="ident">summary</span></span>(<span>self, yname=None, xname=None, title=None, alpha=0.05, percentile=False, get_table=False, verbose=True)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Summary of the sample fit via the SFR algorithm.</p>
@@ -2030,6 +2035,9 @@ Default is False.</dd>
 <dt><strong><code>get_table</code></strong> :&ensp;<code>bool</code></dt>
 <dd>If a summary table should be returned or not. If True, a pandas
 DataFrame with estimation results is returned. Default is False.</dd>
+<dt><strong><code>verbose</code></strong> :&ensp;<code>bool</code></dt>
+<dd>If a summary table should be printed to console or not.
+Default is True.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <p>None. Prints summary table.</p>
@@ -2074,7 +2082,8 @@ sample_fit.summary(title='My Title')
             title=None,
             alpha=0.05,
             percentile=False,
-            get_table=False):
+            get_table=False,
+            verbose=True):
     &#34;&#34;&#34;
     Summary of the sample fit via the SFR algorithm.
     
@@ -2096,6 +2105,9 @@ sample_fit.summary(title='My Title')
     get_table : bool
         If a summary table should be returned or not. If True, a pandas
         DataFrame with estimation results is returned. Default is False.
+    verbose : bool
+        If a summary table should be printed to console or not.
+        Default is True.
 
     Returns
     -------
@@ -2143,7 +2155,8 @@ sample_fit.summary(title='My Title')
         title=title,
         alpha=alpha,
         percentile=percentile,
-        get_table=get_table
+        get_table=get_table,
+        verbose=verbose
         )</code></pre>
 </details>
 </dd>
