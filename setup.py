@@ -9,7 +9,7 @@ long_description = (this_directory / "README.md").read_text()
 setup(
   name = 'samplefit',
   packages = ['samplefit'],
-  version = '0.3.1',
+  version = '0.3.1.9000',
   license = 'MIT',
   description = 'samplefit library implements the Sample Fit Reliability algorithm for the assessment of sample fit in econometric models.',
   long_description_content_type='text/markdown',

@@ -111,7 +111,7 @@ from samplefit.Reliability import SFRAnnealResults
 from samplefit.Reliability import SFRScoreResults
 
 __all__ = ["SFR", "SFRFitResults", "SFRAnnealResults", "SFRScoreResults"]
-__version__ = "0.3.1"
+__version__ = "0.3.1.9000"
 __module__ = 'samplefit'
 __author__ = "Gabriel Okasa & Kenneth A. Younge"
 __copyright__ = "Copyright (c) 2022, Gabriel Okasa & Kenneth A. Younge"

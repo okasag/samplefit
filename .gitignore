@@ -21,6 +21,9 @@
 /samplefit.egg-info/*
 MANIFEST
 
+# exclude dist files
+dist/
+
 # exclude replication and testing files
 replication/
 

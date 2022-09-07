@@ -1,3 +1,7 @@
+[![PyPI version](https://img.shields.io/pypi/v/samplefit.svg)](https://pypi.org/project/samplefit/)
+[![Supported Python versions](https://img.shields.io/pypi/pyversions/samplefit.svg)](https://pypi.org/project/samplefit/)
+[![Licence](https://img.shields.io/pypi/l/samplefit.svg)](https://pypi.org/project/samplefit/)
+
 # `samplefit`
 
 `samplefit` is a Python library to assess sample fit, as opposed to model fit, via the *Sample Fit Reliability* algorithm as developed by Okasa & Younge (2022). `samplefit` is linked to the `statsmodels` library (Seabold & Perktold, 2010) and follows the same command workflow.
