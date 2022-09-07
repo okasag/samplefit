@@ -211,14 +211,14 @@ class BaseSFRFitResults:
     
     # function to print summary
     def summary(self, yname=None, xname=None, title=None, alpha=0.05,
-                percentile=False, get_table=False):
+                percentile=False, get_table=False, verbose=True):
         """
         SFR fit summary.
         """
         
         # check inputs for summary
         self._check_summary_inputs(yname, xname, title, alpha, percentile,
-                                   get_table)
+                                   get_table, verbose)
         
         # get the preamble
         # info about SFR
@@ -244,22 +244,24 @@ class BaseSFRFitResults:
         summary_table = pd.DataFrame(np.round(output, 4),
                                      index=self.xname, columns=header)
         
-        # print the preamble title
-        print('\n',
-              f"{self.title : ^80}",
-              '=' * 80,
-              '-' * 10 + ' SFR Results ' + '-' * 34 + ' Fit Results ' + '-' * 10,
-              '=' * 80,
-              sep='\n')
-        # print the preamble data
-        for idx in range(len(sfr_info)):
-            # print the preambe
-            print(f"{sfr_info[idx]:<15}{sfr_out[idx]:>20}          {fit_info[idx]:<20}{fit_out[idx]:>15}")
-        # print params summary
-        print('=' * 80,
-              summary_table.to_string(justify='right', line_width=80, col_space=10),
-              '=' * 80,
-              sep='\n')
+        # check if printing to a console
+        if self.verbose:
+            # print the preamble title
+            print('\n',
+                  f"{self.title : ^80}",
+                  '=' * 80,
+                  '-' * 10 + ' SFR Results ' + '-' * 34 + ' Fit Results ' + '-' * 10,
+                  '=' * 80,
+                  sep='\n')
+            # print the preamble data
+            for idx in range(len(sfr_info)):
+                # print the preambe
+                print(f"{sfr_info[idx]:<15}{sfr_out[idx]:>20}          {fit_info[idx]:<20}{fit_out[idx]:>15}")
+            # print params summary
+            print('=' * 80,
+                  summary_table.to_string(justify='right', line_width=80, col_space=10),
+                  '=' * 80,
+                  sep='\n')
 
         # return table or None
         return summary_table if self.get_table else None
@@ -429,7 +431,7 @@ class BaseSFRFitResults:
         
     # function for summary inputs checks
     def _check_summary_inputs(self, yname, xname, title, alpha, percentile,
-                              get_table):
+                              get_table, verbose):
         """Input checks for the .summary() function."""
         
         # check name for y
@@ -510,6 +512,15 @@ class BaseSFRFitResults:
             # raise value error
             raise ValueError("get_table must be of type boolean"
                              ", got %s" % type(get_table))
+        
+        # check whether to print to console or not
+        if isinstance(verbose, bool):
+            # assign to self
+            self.verbose = verbose
+        else:
+            # raise value error
+            raise ValueError("verbose must be of type boolean"
+                             ", got %s" % type(verbose))
 
 
 # define BaseAnnealResults class

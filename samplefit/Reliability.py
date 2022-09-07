@@ -475,7 +475,8 @@ class SFRFitResults(BaseSFRFitResults):
                 title=None,
                 alpha=0.05,
                 percentile=False,
-                get_table=False):
+                get_table=False,
+                verbose=True):
         """
         Summary of the sample fit via the SFR algorithm.
         
@@ -497,6 +498,9 @@ class SFRFitResults(BaseSFRFitResults):
         get_table : bool
             If a summary table should be returned or not. If True, a pandas
             DataFrame with estimation results is returned. Default is False.
+        verbose : bool
+            If a summary table should be printed to console or not.
+            Default is True.
 
         Returns
         -------
@@ -544,7 +548,8 @@ class SFRFitResults(BaseSFRFitResults):
             title=title,
             alpha=alpha,
             percentile=percentile,
-            get_table=get_table
+            get_table=get_table,
+            verbose=verbose
             )
 
 
