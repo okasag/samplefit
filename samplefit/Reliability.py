@@ -1,21 +1,22 @@
 """
-samplefit: Random Sample Reliability.
+samplefit.
 
-Python library to assess Sample Fit via the Random Sample Reliability
-algorithm as developed by Okasa & Younge (2022).
+Python library to assess sample fit in econometric models via
+the Sample Fit Reliability (SFR) approach as developed by
+Okasa & Younge (2022).
 
 Definition of main user classes.
 
 """
 
-from samplefit._BaseReliability import BaseRSR
-from samplefit._BaseResultsReliability import BaseRSRFitResults
-from samplefit._BaseResultsReliability import BaseRSRAnnealResults
-from samplefit._BaseResultsReliability import BaseRSRScoreResults
+from samplefit._BaseReliability import BaseSFR
+from samplefit._BaseResultsReliability import BaseSFRFitResults
+from samplefit._BaseResultsReliability import BaseSFRAnnealResults
+from samplefit._BaseResultsReliability import BaseSFRScoreResults
 
-class RSR(BaseRSR):
+class SFR(BaseSFR):
     """
-    Random Sample Reliability class labeled `RSR()`. Initializes
+    Sample Fit Reliability class labeled `SFR()`. Initializes
     parameters for sample fit.
 
     Parameters
@@ -23,24 +24,25 @@ class RSR(BaseRSR):
     linear_model : statsmodels class
         Linear model specified via statsmodels OLS or GLM class.
     n_samples : int
-        The number of samples in the sub-sampling. The default is 1000.
+        The number of sub-samples in the re-sampling procedure.
+        The default is 1000.
     min_samples : int, float or NoneType
-        Minimum number of observations for each subsample, i.e. number of
+        Minimum number of observations for each sub-sample, i.e. number of
         observations to draw from the data without replacement. If integer
-        supplied, exact number of observation is sampeld. If float, share of
+        supplied, exact number of observation is sampled. If float, share of
         full sample is considered (rounded up). If None, the minimum number of
-        observations to estimate the model is selected, i.e p+1, where p is
-        number of model parameters. The default is None.
+        observations to estimate the model is selected, i.e p+1 (reccommended),
+        where p is number of model parameters. The default is None.
     loss : str or lambda function
         Loss function for evaluation of the estimation errors. Loss must be
-        either 'squared_error' or 'absolute_error'. For a user defined loss
-        function, user can directly supply own lambda function of type:
-        'lambda y, yhat:'. Default is 'absolute_error'.
+        either 'absolute_error' (reccommended) or 'squared_error'. For a user
+        defined loss function, user can directly supply own lambda function of
+        type: 'lambda y, yhat:'. Default is 'absolute_error'.
     n_jobs : int or NoneType
         The number of parallel jobs to be used for multithreading in
-        [`.fit()`](#samplefit.Reliability.RSR.fit),
-        [`.score()`](#samplefit.Reliability.RSR.score) and
-        [`.anneal()`](#samplefit.Reliability.RSR.anneal).
+        [`.fit()`](#samplefit.Reliability.SFR.fit),
+        [`.score()`](#samplefit.Reliability.SFR.score) and
+        [`.anneal()`](#samplefit.Reliability.SFR.anneal).
         Follows
         [`joblib`](https://joblib.readthedocs.io){:target="_blank"} semantics:
 
@@ -48,23 +50,23 @@ class RSR(BaseRSR):
         - `n_jobs=None` and `n_jobs=1` means no parallelism.
 
         The default is -1.
-    random_state : int, None or numpy.random.RandomState object
+    random_state : int, NoneType or numpy.random.RandomState object
         Random seed used to initialize the pseudo-random number
         generator. See
         [`numpy` documentation](https://numpy.org/doc/stable/reference/random/legacy.html){:target="_blank"}
-        for details. The default is None.
+        for details. If None specified, 0 is used. The default is None.
 
     Returns
     -------
-    Initializes RSR class. Following methods are available:
+    Initializes SFR class. Following methods are available:
     .fit(), .score() and .anneal().
 
 
     Notes
     -----
-    `RSR()` includes methods to [`.fit()`](#samplefit.Reliability.RSR.fit),
-    [`.score()`](#samplefit.Reliability.RSR.score) and
-    [`.anneal()`](#samplefit.Reliability.RSR.anneal).
+    `SFR()` includes methods to [`.fit()`](#samplefit.Reliability.SFR.fit),
+    [`.score()`](#samplefit.Reliability.SFR.score) and
+    [`.anneal()`](#samplefit.Reliability.SFR.anneal).
 
     For further details, see examples below.
 
@@ -77,8 +79,8 @@ class RSR(BaseRSR):
     
     # get data 
     boston = sm.datasets.get_rdataset("Boston", "MASS")
-    Y = boston.data['medv'] # median house price
-    X = boston.data['rm'] # number of rooms
+    Y = boston.data['crim'] # per capita crime rate
+    X = boston.data['lstat'] # % lower status population
     X = sm.add_constant(X)
     
     # assess model fit
@@ -87,7 +89,7 @@ class RSR(BaseRSR):
     model_fit.summary()
     
     # assess sample fit
-    sample = sf.RSR(linear_model=model)
+    sample = sf.SFR(linear_model=model)
     sample_fit = sample.fit()
     sample_fit.summary()
     
@@ -124,7 +126,7 @@ class RSR(BaseRSR):
             weights=None,
             n_boot=None):
         """
-        Sample fit based on the reliability scores via the RSR algorithm.
+        Sample fit based on the reliability scores via the SFR algorithm.
 
         Parameters
         ----------
@@ -141,15 +143,15 @@ class RSR(BaseRSR):
 
         Returns
         -------
-        Results of class RSRFitResults. Following methods are available:
+        Results of class SFRFitResults. Following methods are available:
         .summary(), .conf_int() and .predict().
 
         Notes
         -----
-        [`.fit()`](#samplefit.Reliability.RSR.fit) estimates the reliability
-        scores via the RSR algorithm in the first step and estimates weighted
-        regression in the second step, with the reliability scores as weights
-        if not specified otherwise.
+        [`.fit()`](#samplefit.Reliability.SFR.fit) estimates the reliability
+        scores via the SFR algorithm in the first step and estimates weighted
+        regression in the second step, with the squared reliability scores as
+        weights if not specified otherwise.
 
         Examples
         --------
@@ -160,15 +162,15 @@ class RSR(BaseRSR):
         
         # get data 
         boston = sm.datasets.get_rdataset("Boston", "MASS")
-        Y = boston.data['medv'] # median house price
-        X = boston.data['rm'] # number of rooms
+        Y = boston.data['crim'] # per capita crime rate
+        X = boston.data['lstat'] # % lower status population
         X = sm.add_constant(X)
         
         # specify model
         model = sm.OLS(endog=Y, exog=X)
         
         # specify sample
-        sample = sf.RSR(linear_model=model)
+        sample = sf.SFR(linear_model=model)
         
         # sample fit with defaults
         sample_fit = sample.fit()
@@ -194,7 +196,7 @@ class RSR(BaseRSR):
 
     def score(self):
         """
-        Estimation of reliability scores via the RSR algorithm.
+        Estimation of reliability scores via the SFR algorithm.
 
         Parameters
         ----------
@@ -202,13 +204,13 @@ class RSR(BaseRSR):
 
         Returns
         -------
-        Results of class RSRScoreResults. Following methods are available:
+        Results of class SFRScoreResults. Following methods are available:
         .plot().
 
         Notes
         -----
-        [`.score()`](#samplefit.Reliability.RSR.score) estimates the
-        reliability scores via the RSR algorithm. Each observation is scored
+        [`.score()`](#samplefit.Reliability.SFR.score) estimates the
+        reliability scores via the SFR algorithm. Each observation is scored
         for the reliability with 0 being the most unreliable observation and
         with 1 being the most reliable observation within a sample.
 
@@ -221,15 +223,15 @@ class RSR(BaseRSR):
         
         # get data 
         boston = sm.datasets.get_rdataset("Boston", "MASS")
-        Y = boston.data['medv'] # median house price
-        X = boston.data['rm'] # number of rooms
+        Y = boston.data['crim'] # per capita crime rate
+        X = boston.data['lstat'] # % lower status population
         X = sm.add_constant(X)
         
         # specify model
         model = sm.OLS(endog=Y, exog=X)
         
         # specify sample
-        sample = sf.RSR(linear_model=model)
+        sample = sf.SFR(linear_model=model)
         
         # score reliability
         sample_scores = sample.score()
@@ -246,7 +248,7 @@ class RSR(BaseRSR):
 
     def anneal(self, share=0.1, n_boot=None):
         """
-        Sample annealing based on the reliability scores via the RSR algorithm.
+        Sample annealing based on the reliability scores via the SFR algorithm.
 
         Parameters
         ----------
@@ -261,12 +263,12 @@ class RSR(BaseRSR):
 
         Returns
         -------
-        Results of class RSRAnnealResults. Following methods are available:
+        Results of class SFRAnnealResults. Following methods are available:
         .conf_int() and .plot().
 
         Notes
         -----
-        [`.anneal()`](#samplefit.Reliability.RSR.anneal) re-estimates the model
+        [`.anneal()`](#samplefit.Reliability.SFR.anneal) re-estimates the model
         while sequentially dropping the most unreliable observations. Such
         annealing procedure helps to assess the sample sensitivity and detect
         how much the parameters depend on particularly unreliable observations.
@@ -280,15 +282,15 @@ class RSR(BaseRSR):
         
         # get data 
         boston = sm.datasets.get_rdataset("Boston", "MASS")
-        Y = boston.data['medv'] # median house price
-        X = boston.data['rm'] # number of rooms
+        Y = boston.data['crim'] # per capita crime rate
+        X = boston.data['lstat'] # % lower status population
         X = sm.add_constant(X)
         
         # specify model
         model = sm.OLS(endog=Y, exog=X)
         
         # specify sample
-        sample = sf.RSR(linear_model=model)
+        sample = sf.SFR(linear_model=model)
         
         # sample annealing with defaults
         sample_annealing = sample.anneal()
@@ -313,10 +315,10 @@ class RSR(BaseRSR):
 
 
 # class for FitResults
-class RSRFitResults(BaseRSRFitResults):
+class SFRFitResults(BaseSFRFitResults):
     """
-    Reliability Results class labeled `RSRFitResults()`.
-    Initializes output of RSR.fit().
+    Fit Results class labeled `SFRFitResults()`.
+    Initializes output of SFR.fit().
 
     """
 
@@ -342,7 +344,7 @@ class RSRFitResults(BaseRSRFitResults):
                 params=None,
                 exog=None):
         """
-        Predict outcomes based on the sample fit via the RSR algorithm.
+        Predict outcomes based on the sample fit via the SFR algorithm.
         
         Parameters
         ----------
@@ -363,7 +365,7 @@ class RSRFitResults(BaseRSRFitResults):
 
         Notes
         -----
-        [`.predict()`](#samplefit.Reliability.RSRFitResults.predict) constructs
+        [`.predict()`](#samplefit.Reliability.SFRFitResults.predict) constructs
         predictions for outcome variable based on the estimated parameters.
         Predictions are based on the parameters of weighted fit. If no new
         values for exogeneous variables are supplied, fitted values are
@@ -378,15 +380,15 @@ class RSRFitResults(BaseRSRFitResults):
         
         # get data 
         boston = sm.datasets.get_rdataset("Boston", "MASS")
-        Y = boston.data['medv'] # median house price
-        X = boston.data['rm'] # number of rooms
+        Y = boston.data['crim'] # per capita crime rate
+        X = boston.data['lstat'] # % lower status population
         X = sm.add_constant(X)
         
         # specify model
         model = sm.OLS(endog=Y, exog=X)
         
         # specify sample
-        sample = sf.RSR(linear_model=model)
+        sample = sf.SFR(linear_model=model)
         
         # sample fit
         sample_fit = sample.fit()
@@ -408,7 +410,7 @@ class RSRFitResults(BaseRSRFitResults):
                  alpha=0.05,
                  percentile=False):
         """
-        Confidence intervals based on the sample fit via the RSR algorithm.
+        Confidence intervals based on the sample fit via the SFR algorithm.
         
         Parameters
         ----------
@@ -425,10 +427,10 @@ class RSRFitResults(BaseRSRFitResults):
 
         Notes
         -----
-        [`.conf_int()`](#samplefit.Reliability.RSRFitResults.conf_int) constructs
-        confidence intervals for estimated paramaters. If fitted without
-        bootstrapping, asymptotic approximations are used. If fitted with
-        bootstrapping, the standard deviation of bootstrapped parameters
+        [`.conf_int()`](#samplefit.Reliability.SFRFitResults.conf_int)
+        constructs confidence intervals for estimated paramaters. If fitted
+        without bootstrapping, asymptotic approximations are used. If fitted
+        with bootstrapping, the standard deviation of bootstrapped parameters
         is used for standard error approximation. If percentile=True, the
         percentile method is used instead of standard deviation.
 
@@ -441,15 +443,15 @@ class RSRFitResults(BaseRSRFitResults):
         
         # get data 
         boston = sm.datasets.get_rdataset("Boston", "MASS")
-        Y = boston.data['medv'] # median house price
-        X = boston.data['rm'] # number of rooms
+        Y = boston.data['crim'] # per capita crime rate
+        X = boston.data['lstat'] # % lower status population
         X = sm.add_constant(X)
         
         # specify model
         model = sm.OLS(endog=Y, exog=X)
         
         # specify sample
-        sample = sf.RSR(linear_model=model)
+        sample = sf.SFR(linear_model=model)
         
         # sample fit
         sample_fit = sample.fit()
@@ -475,7 +477,7 @@ class RSRFitResults(BaseRSRFitResults):
                 percentile=False,
                 get_table=False):
         """
-        Summary of the sample fit via the RSR algorithm.
+        Summary of the sample fit via the SFR algorithm.
         
         Parameters
         ----------
@@ -485,8 +487,7 @@ class RSRFitResults(BaseRSRFitResults):
             List of name of the exog variables. Must have the same dimension as
             exog columns. Default are the supplied exog names.
         title : str or NoneType
-            Title for the summary table. Default is
-            'Random Sample Reliability Fit Results'.
+            Title for the summary table. Default is 'SFR: Fitting'.
         alpha : float or NoneType
             Confidence level alpha. Default is 0.05.
         percentile : bool
@@ -503,7 +504,7 @@ class RSRFitResults(BaseRSRFitResults):
 
         Notes
         -----
-        [`.summary()`](#samplefit.Reliability.RSRFitResults.summary) produces
+        [`.summary()`](#samplefit.Reliability.SFRFitResults.summary) produces
         a summary table including information on sample fit as well as model
         fit together with parameters, standard errors, t-values, p-values
         and confidence intervals.
@@ -517,15 +518,15 @@ class RSRFitResults(BaseRSRFitResults):
         
         # get data 
         boston = sm.datasets.get_rdataset("Boston", "MASS")
-        Y = boston.data['medv'] # median house price
-        X = boston.data['rm'] # number of rooms
+        Y = boston.data['crim'] # per capita crime rate
+        X = boston.data['lstat'] # % lower status population
         X = sm.add_constant(X)
         
         # specify model
         model = sm.OLS(endog=Y, exog=X)
         
         # specify sample
-        sample = sf.RSR(linear_model=model)
+        sample = sf.SFR(linear_model=model)
         
         # sample fit
         sample_fit = sample.fit()
@@ -548,10 +549,10 @@ class RSRFitResults(BaseRSRFitResults):
 
 
 # class for AnnealResults
-class RSRAnnealResults(BaseRSRAnnealResults):
+class SFRAnnealResults(BaseSFRAnnealResults):
     """
-    Reliability Results class labeled `RSRAnnealResults()`.
-    Initializes output of RSR.anneal().
+    Annealing results class labeled `SFRAnnealResults()`.
+    Initializes output of SFR.anneal().
 
     """
 
@@ -587,8 +588,8 @@ class RSRAnnealResults(BaseRSRAnnealResults):
              dpi=None,
              fname=None):
         """
-        Plot the Annealing based on the reliability scores via the RSR
-        of class `Sample()`.
+        Plot the Annealing based on the reliability scores from the SFR
+        algorithm.
         
         Parameters
         ----------
@@ -600,8 +601,7 @@ class RSRAnnealResults(BaseRSRAnnealResults):
             variable names. If not supplied annealing plots for all parameters
             are constructed. Default are the supplied exog names.
         title : str or NoneType
-            Title for the annealing plot. Default is
-            'RSR: Annealing Sensitivity'.
+            Title for the annealing plot. Default is 'SFR: Annealing'.
         alpha : float or NoneType
             Confidence level alpha. Default is 0.05.
         percentile : bool
@@ -630,11 +630,11 @@ class RSRAnnealResults(BaseRSRAnnealResults):
 
         Returns
         -------
-        Dictionary of matplotlib figures. Prints annealing plots.
+        Dictionary of matplotlib figures and axes. Prints annealing plots.
 
         Notes
         -----
-        [`.plot()`](#samplefit.Reliability.RSRAnnealResults.plot) produces
+        [`.plot()`](#samplefit.Reliability.SFRAnnealResults.plot) produces
         an annealing plot for assessment of sample fit sensitivity, together
         with parameters and confidence intervals.
 
@@ -647,15 +647,15 @@ class RSRAnnealResults(BaseRSRAnnealResults):
         
         # get data 
         boston = sm.datasets.get_rdataset("Boston", "MASS")
-        Y = boston.data['medv'] # median house price
-        X = boston.data['rm'] # number of rooms
+        Y = boston.data['crim'] # per capita crime rate
+        X = boston.data['lstat'] # % lower status population
         X = sm.add_constant(X)
         
         # specify model
         model = sm.OLS(endog=Y, exog=X)
         
         # specify sample
-        sample = sf.RSR(linear_model=model)
+        sample = sf.SFR(linear_model=model)
         
         # sample annealing
         sample_annealing = sample.anneal()
@@ -687,8 +687,7 @@ class RSRAnnealResults(BaseRSRAnnealResults):
                  alpha=0.05,
                  percentile=False):
         """
-        Fitting the model based on the reliability scores via the RSR algorithm
-        of class `Sample()`.
+        Confidence intervals based on the annealing via the SFR algorithm.
         
         Parameters
         ----------
@@ -696,7 +695,7 @@ class RSRAnnealResults(BaseRSRAnnealResults):
             Confidence level alpha. Default is 0.05.
         percentile : bool
             Percentile method for confidence intervals based on bootstrapping.
-            If bootstrapping has not been used for fitting, it is ignored.
+            If bootstrapping has not been used for annealing, it is ignored.
             Default is False.
 
         Returns
@@ -705,7 +704,7 @@ class RSRAnnealResults(BaseRSRAnnealResults):
 
         Notes
         -----
-        [`.conf_int()`](#samplefit.Reliability.RSRAnnealResults.conf_int)
+        [`.conf_int()`](#samplefit.Reliability.SFRAnnealResults.conf_int)
         constructs confidence intervals for estimated paramaters. If annealed
         without bootstrapping, asymptotic approximations are used. If annealed
         with bootstrapping, the standard deviation of bootstrapped parameters
@@ -721,15 +720,15 @@ class RSRAnnealResults(BaseRSRAnnealResults):
         
         # get data 
         boston = sm.datasets.get_rdataset("Boston", "MASS")
-        Y = boston.data['medv'] # median house price
-        X = boston.data['rm'] # number of rooms
+        Y = boston.data['crim'] # per capita crime rate
+        X = boston.data['lstat'] # % lower status population
         X = sm.add_constant(X)
         
         # specify model
         model = sm.OLS(endog=Y, exog=X)
         
         # specify sample
-        sample = sf.RSR(linear_model=model)
+        sample = sf.SFR(linear_model=model)
         
         # sample annealing
         sample_annealing = sample.anneal()
@@ -748,10 +747,10 @@ class RSRAnnealResults(BaseRSRAnnealResults):
 
 
 # class for ScoreResults
-class RSRScoreResults(BaseRSRScoreResults):
+class SFRScoreResults(BaseSFRScoreResults):
     """
-    Reliability Results class labeled `RSRScoreResults()`.
-    Initializes output of RSR.score().
+    Scoring results class labeled `SFRScoreResults()`.
+    Initializes output of SFR.score().
 
     """
 
@@ -780,7 +779,7 @@ class RSRScoreResults(BaseRSRScoreResults):
              fname=None,
              jitter=False):
         """
-        Plot the Reliability Scores based on the RSR algorithm.
+        Plot the reliability scores based on the SFR algorithm.
         
         Parameters
         ----------
@@ -788,12 +787,11 @@ class RSRScoreResults(BaseRSRScoreResults):
             Name of the endog variable. Default is 'y'.
         xname : list, tuple, str or NoneType
             Name or list of names of the exog variables for which parameter
-            an annealing plot should be constructed. Must be one of the exog 
-            variable names. If not supplied annealing plots for all parameters
+            an scoring plot should be constructed. Must be one of the exog 
+            variable names. If not supplied scoring plots for all parameters
             are constructed. Default are the supplied exog names.
         title : str or NoneType
-            Title for the annealing plot. Default is
-            'RSR: Annealing Sensitivity'.
+            Title for the scoring plot. Default is 'SFR: Scoring'.
         cmap : str or NoneType
             Color map used for the reliability score. Must be one of the
             matplotlib supported color maps. Default is 'RdYlGn'.
@@ -804,7 +802,7 @@ class RSRScoreResults(BaseRSRScoreResults):
             Tuple of x and y axis size for matplotlib figsize argument.
             Default is (10,5).
         s : float, int or NoneType
-            The marker size in points**2 for in matplotlib scatter plot.
+            The marker size in points**2 as for in matplotlib scatter plot.
             Default is automatic.
         ylim : tuple, list or NoneType
             Tuple of upper and lower limits of y axis. Default is automatic.
@@ -825,11 +823,11 @@ class RSRScoreResults(BaseRSRScoreResults):
     
         Returns
         -------
-        Dictionary of matplotlib figures. Prints scoring plots.
+        Dictionary of matplotlib figures and axes. Prints scoring plots.
 
         Notes
         -----
-        [`.plot()`](#samplefit.Reliability.RSRScoreResults.plot) produces
+        [`.plot()`](#samplefit.Reliability.SFRScoreResults.plot) produces
         a scoring plot for assessment of sample fit reliability.
 
         Examples
@@ -841,15 +839,15 @@ class RSRScoreResults(BaseRSRScoreResults):
         
         # get data 
         boston = sm.datasets.get_rdataset("Boston", "MASS")
-        Y = boston.data['medv'] # median house price
-        X = boston.data['rm'] # number of rooms
+        Y = boston.data['crim'] # per capita crime rate
+        X = boston.data['lstat'] # % lower status population
         X = sm.add_constant(X)
         
         # specify model
         model = sm.OLS(endog=Y, exog=X)
         
         # specify sample
-        sample = sf.RSR(linear_model=model)
+        sample = sf.SFR(linear_model=model)
         
         # sample reliability
         sample_scores = sample.score()

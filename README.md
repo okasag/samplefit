@@ -1,6 +1,6 @@
-# `samplefit`: Random Sample Reliability
+# `samplefit`
 
-`samplefit` is a Python library to assess sample fit, as opposed to model fit, via the Random Sample Reliability algorithm as developed by Okasa & Younge (2022). `samplefit` is built upon the `statsmodels` library (Seabold & Perktold, 2010) and follows the same command workflow.
+`samplefit` is a Python library to assess sample fit, as opposed to model fit, via the *Sample Fit Reliability* algorithm as developed by Okasa & Younge (2022). `samplefit` is linked to the `statsmodels` library (Seabold & Perktold, 2010) and follows the same command workflow.
 
 Copyright (c) 2022 Gabriel Okasa & Kenneth A. Younge.
 
@@ -8,26 +8,39 @@ Copyright (c) 2022 Gabriel Okasa & Kenneth A. Younge.
 	SOURCE:  https://github.com/okasag/samplefit
 	LICENSE: Access to this code is provided under an MIT License.
 
-Repo maintainer: Gabriel Okasa ([gabriel.okasa@epfl.ch](mailto:gabriel.okasa@epfl.ch))
+Repo maintainer: Gabriel Okasa ([okasa.gabriel@gmail.com](mailto:okasa.gabriel@gmail.com))
 
 ## Introduction
 
-Researchers frequently test model fit by holding data constant and varying the model. We propose Random Sample Reliability (RSR) as a computational framework to test sample fit by holding the model constant and varying the data. Random Sample Reliability re-samples data to estimate the reliability of observations of a sample. RSR can be used to score the reliability of every observation within the sample, test the sensitivity of results to atypical observations via annealing procedure, and estimate a weighted fit where the analysis is more robust.
+`samplefit` is a Python library for the assessment of sample fit in
+econometric models. In particular, `samplefit` implements the Sample Fit
+Reliability (SFR) algorithm, a re-sampling procedure to estimate the
+reliability of data and check the sensitivity of results. To that end,
+SFR is a computational approach with three aspects: *Scoring*, to estimate a 
+point-wise reliability score for every observation in a sample based on the
+expected estimation loss over sub-samples; *Annealing*, to test the sensitivity
+of results to the sequential removal of unreliable data points; and *Fitting*,
+to estimate a weighted regression that adjusts for the reliability of the data.
 
 Detailed documentation of the `samplefit` library is available [here](https://okasag.github.io/samplefit/).
 
-Poster describing the RSR algorithm is available [here](https://okasag.github.io/assets/pdf/Okasa_Younge_RSR_Poster_SciPy.pdf).
-
 ## Installation
 
-To clone this repo for the `samplefit` library run:
+To install the `samplefit` library from `PyPi` run:
+
+```
+pip install samplefit
+```
+
+or alternatively, to clone the repo run:
 
 ```
 git clone https://github.com/okasag/samplefit.git
 ```
 
-The required modules can be installed by navigating to the root of this project and
-executing the following command: `pip install -r requirements.txt`.
+The required modules can be installed by navigating to the root of
+the cloned project and executing the following command:
+`pip install -r requirements.txt`. 
 
 ## Example
 
@@ -42,8 +55,8 @@ import statsmodels.api as sm
 Get data:
 ```python
 boston = sm.datasets.get_rdataset("Boston", "MASS")
-Y = boston.data['medv']
-X = boston.data['rm']
+Y = boston.data['crim']
+X = boston.data['lstat']
 X = sm.add_constant(X)
 ```
 
@@ -56,7 +69,7 @@ model_fit.summary()
 
 Assess sample fit:
 ```python
-sample = sf.RSR(linear_model=model)
+sample = sf.SFR(linear_model=model)
 sample_fit = sample.fit()
 sample_fit.summary()
 ```

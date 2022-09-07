@@ -1,19 +1,33 @@
 """
+
+ `samplefit` is a Python library to assess sample fit, as opposed to model fit,
+ via the *Sample Fit Reliability* algorithm as developed by Okasa & Younge (2022).
+ `samplefit` is linked to the `statsmodels` library (Seabold & Perktold, 2010)
+ and follows the same command workflow.
+
+ 
  Description
  ----------------------------
- A Python implementation of the Random Sample Reliability (RSR) algorithm as
- developed in Okasa & Younge (2022). The RSR estimates the reliability scores
- for each observation within the sample. The RSR reliability scores reflect
- the reverse of an average estimation loss resulting from a resampling
- procedure. These scores can be further used for an annealing sensitivity
- analysis to assess the impact of unreliable observations, or for a weighted
- regression or a consensus estimation to reduce the impact of less reliable
- observations.
+ `samplefit` is a Python library for the assessment of sample fit in
+ econometric models. In particular, `samplefit` implements the Sample Fit
+ Reliability (SFR) algorithm, a re-sampling procedure to estimate the
+ reliability of data and check the sensitivity of results. To that end,
+ SFR is a computational approach with three aspects: *Scoring*, to estimate a 
+ point-wise reliability score for every observation in a sample based on the
+ expected estimation loss over sub-samples; *Annealing*, to test the sensitivity
+ of results to the sequential removal of unreliable data points; and *Fitting*,
+ to estimate a weighted regression that adjusts for the reliability of the data.
 
  Installation
  ----------------------------
  
- To clone the repo for the `samplefit` library run:
+ To install the `samplefit` library from `PyPi` run:
+
+ ```
+ pip install samplefit
+ ```
+ 
+ or alternatively, to clone the repo run:
 
  ```
  git clone https://github.com/okasag/samplefit.git
@@ -26,9 +40,11 @@
  * scipy (>=1.7.2)
  * statsmodels (>=0.12.2)
  * matplotlib (>=3.4.2)
+ * joblib (>=1.0.1)
+ * psutil (>=5.8.0)
  
- The required modules can be installed by navigating to the root of the cloned
- project and executing the following command:
+ The required modules can be installed by navigating to the root of
+ the cloned project and executing the following command:
  `pip install -r requirements.txt`. 
 
  Examples
@@ -46,8 +62,8 @@
  Get data:
  ```python
  boston = sm.datasets.get_rdataset("Boston", "MASS")
- Y = boston.data['medv']
- X = boston.data['rm']
+ Y = boston.data['crim']
+ X = boston.data['lstat']
  X = sm.add_constant(X)
  ```
 
@@ -60,7 +76,7 @@
 
  Assess sample fit:
  ```python
- sample = sf.RSR(model=model)
+ sample = sf.SFR(model=model)
  sample_fit = sample.fit()
  sample_fit.summary()
  ```
@@ -83,20 +99,19 @@
 
  References
  ----------------------------
- - Okasa, Gabriel, and Kenneth A. Younge. “Random Sample Reliability.”
- Working Paper. 2022.
+ - Okasa, Gabriel, and Kenneth A. Younge. “Sample Fit.” Working Paper. 2022.
  - Seabold, Skipper, and Josef Perktold. “statsmodels: Econometric and 
  statistical modeling with python.” Proceedings of the 9th Python in Science 
  Conference. 2010.
 """
 
-from samplefit.Reliability import RSR
-from samplefit.Reliability import RSRFitResults
-from samplefit.Reliability import RSRAnnealResults
-from samplefit.Reliability import RSRScoreResults
+from samplefit.Reliability import SFR
+from samplefit.Reliability import SFRFitResults
+from samplefit.Reliability import SFRAnnealResults
+from samplefit.Reliability import SFRScoreResults
 
-__all__ = ["RSR", "RSRFitResults", "RSRAnnealResults", "RSRScoreResults"]
-__version__ = "0.0.9000"
+__all__ = ["SFR", "SFRFitResults", "SFRAnnealResults", "SFRScoreResults"]
+__version__ = "0.3.1"
 __module__ = 'samplefit'
 __author__ = "Gabriel Okasa & Kenneth A. Younge"
 __copyright__ = "Copyright (c) 2022, Gabriel Okasa & Kenneth A. Younge"

@@ -6,8 +6,8 @@ import statsmodels.api as sm
 
 # get data
 boston = sm.datasets.get_rdataset("Boston", "MASS")
-Y = boston.data['crim'] # crime rate
-X = boston.data['lstat'] # % of lower status
+Y = boston.data['crim'] # per capita crime rate
+X = boston.data['lstat'] # % lower status population
 X = sm.add_constant(X)
 
 # assess model fit
@@ -16,7 +16,7 @@ model_fit = model.fit()
 model_fit.summary()
 
 # assess sample fit
-sample = sf.RSR(linear_model=model)
+sample = sf.SFR(linear_model=model)
 sample_fit = sample.fit()
 sample_fit.summary()
 

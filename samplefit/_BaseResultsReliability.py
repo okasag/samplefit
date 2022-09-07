@@ -1,10 +1,11 @@
 """
-samplefit: Random Sample Reliability.
+samplefit.
 
-Python library to assess Sample Fit via the Random Sample Reliability
-algorithm as developed by Okasa & Younge (2022).
+Python library to assess sample fit in econometric models via
+the Sample Fit Reliability (SFR) approach as developed by
+Okasa & Younge (2022).
 
-Definition of Reliability Results Classes and the methods.
+Definition of SFR results classes and the methods.
 
 """
 
@@ -14,22 +15,20 @@ import matplotlib
 import samplefit.Reliability as Reliability
 
 # import modules
-import numpy as np # (hast to be 1.22.0 at least, due to np.percentile changes)
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
 # import submodules and functions
 from scipy import stats
-from multiprocessing import cpu_count, Lock
 from matplotlib.colors import is_color_like
-# TODO: add check_random_state from statsmodels 0.14.0
 
 
-# %% RSR Results Classes
+# %% SFR Results Classes
 # define BaseFitResults class
-class BaseRSRFitResults:
+class BaseSFRFitResults:
     """
-    Base class for RSRFitResults.
+    Base class for SFRFitResults.
     This class should not be used directly. Use derived classes instead.
     """
 
@@ -54,7 +53,7 @@ class BaseRSRFitResults:
 
 
     def _output_checks(self):
-        """Output checks for the BaseRSRFitResults class init."""
+        """Output checks for the BaseSFRFitResults class init."""
         
         # check and define the output parameters
         sample = self.sample
@@ -63,14 +62,14 @@ class BaseRSRFitResults:
         stand_err = self.stand_err
         fittedvalues = self.fittedvalues
 
-        # check if the sample is of class RSR
-        if isinstance(sample, Reliability.RSR):
+        # check if the sample is of class SFR
+        if isinstance(sample, Reliability.SFR):
             # assign the value
             self.sample = sample
         else:
             # raise value error
             raise ValueError('sample must be a class of '
-                             'samplefit.Reliability.RSR '
+                             'samplefit.Reliability.SFR '
                              f', got {type(sample)}.')
 
         # check the estimated parameters is an array
@@ -171,7 +170,7 @@ class BaseRSRFitResults:
     # function to predict yhats based on the weighted fit
     def predict(self, params=None, exog=None):
         """
-        RSR prediction after fit.
+        SFR prediction after fit.
         """
         
         # check inputs for predict
@@ -187,7 +186,7 @@ class BaseRSRFitResults:
     # function to compute confidence intervals
     def conf_int(self, alpha=0.05, percentile=False):
         """
-        RSR confidence intervals after fit.
+        SFR confidence intervals after fit.
         """
         
         # check the inputs
@@ -214,7 +213,7 @@ class BaseRSRFitResults:
     def summary(self, yname=None, xname=None, title=None, alpha=0.05,
                 percentile=False, get_table=False):
         """
-        RSR fit summary.
+        SFR fit summary.
         """
         
         # check inputs for summary
@@ -222,9 +221,9 @@ class BaseRSRFitResults:
                                    get_table)
         
         # get the preamble
-        # info abour RSR
-        rsr_info = ['No. Samples:', 'Min. Samples:', 'Loss:', 'Gini:']
-        rsr_out = [self.sample.n_samples, self.min_samples,
+        # info about SFR
+        sfr_info = ['No. Samples:', 'Min. Samples:', 'Loss:', 'Gini:']
+        sfr_out = [self.sample.n_samples, self.min_samples,
                    self.loss, np.round(self.gini, 4)]
         # info about fit
         fit_info = ['Dep. Variable:', 'No. Observations:', 'Df Residuals:',
@@ -233,7 +232,7 @@ class BaseRSRFitResults:
                    np.round(self.rsquared, 4)]
         
         # get header for table
-        header = ['coef', 'std err', 't', 'P>|t|',
+        header = ['Coef.', 'Std.Err.', 't', 'P>|t|',
                   '[' + str(alpha/2), str(1-alpha/2) + ']']
         # compute conf int
         ci_low, ci_up = self.conf_int(alpha=self.alpha,
@@ -249,13 +248,13 @@ class BaseRSRFitResults:
         print('\n',
               f"{self.title : ^80}",
               '=' * 80,
-              '-' * 10 + ' RSR Results ' + '-' * 34 + ' Fit Results ' + '-' * 10,
+              '-' * 10 + ' SFR Results ' + '-' * 34 + ' Fit Results ' + '-' * 10,
               '=' * 80,
               sep='\n')
         # print the preamble data
-        for idx in range(len(rsr_info)):
+        for idx in range(len(sfr_info)):
             # print the preambe
-            print(f"{rsr_info[idx]:<15}{rsr_out[idx]:>20}          {fit_info[idx]:<20}{fit_out[idx]:>15}")
+            print(f"{sfr_info[idx]:<15}{sfr_out[idx]:>20}          {fit_info[idx]:<20}{fit_out[idx]:>15}")
         # print params summary
         print('=' * 80,
               summary_table.to_string(justify='right', line_width=80, col_space=10),
@@ -468,8 +467,8 @@ class BaseRSRFitResults:
         
         # check name for title
         if title is None:
-            # set default as RSR title
-            self.title = 'Random Sample Reliability Fit Results'
+            # set default as SFR title
+            self.title = 'SFR: Fitting'
         # if supplied check if its valid
         elif isinstance(title, str):
             # set value to user supplied
@@ -514,10 +513,10 @@ class BaseRSRFitResults:
 
 
 # define BaseAnnealResults class
-class BaseRSRAnnealResults:
+class BaseSFRAnnealResults:
     """
-    Base class for RSRAnnealResults.
-    This class should not be used directly. Use derived classes instead.
+    Base class for SFRAnnealResults.
+    This class should not be used directly. Use derived user classes instead.
     """
 
     # define init function
@@ -541,7 +540,7 @@ class BaseRSRAnnealResults:
 
 
     def _output_checks(self):
-        """Output checks for the BaseRSRAnnealResults class init."""
+        """Output checks for the BaseSFRAnnealResults class init."""
         
         # check and define the output parameters
         sample = self.sample
@@ -550,14 +549,14 @@ class BaseRSRAnnealResults:
         stand_err = self.stand_err
         drop_idx = self.drop_idx
 
-        # check if the sample is of class RSR
-        if isinstance(sample, Reliability.RSR):
+        # check if the sample is of class SFR
+        if isinstance(sample, Reliability.SFR):
             # assign the value
             self.sample = sample
         else:
             # raise value error
             raise ValueError('sample must be a class of '
-                             'SampleFit.Reliability.RSR '
+                             'SampleFit.Reliability.SFR '
                              f', got {type(sample)}.')
 
         # check the estimated parameters is an array
@@ -667,7 +666,7 @@ class BaseRSRAnnealResults:
              color=None, path=None, figsize=None, ylim=None, xlabel=None,
              dpi=None, fname=None):
         """
-        RSR Annealing Sensitivity Plot.
+        SFR Annealing Plot.
         """
         
         # check inputs for plot
@@ -708,8 +707,6 @@ class BaseRSRAnnealResults:
             # set limits if specified
             if not self.ylim is None:
                 ax.set_ylim(self.ylim)
-            # ax.set_ylim([np.min(self.params[:, var_idx]),
-            #              np.max(self.params[:, var_idx])])
             # allow buffer on left and right
             ax.set_xlim([-0.065*x_width, x_width + 0.065*x_width])
             
@@ -761,7 +758,7 @@ class BaseRSRAnnealResults:
     # function to compute confidence intervals for annealing sensitivity
     def conf_int(self, alpha=0.05, percentile=False):
         """
-        RSR confidence intervals after anneal.
+        SFR confidence intervals after annealing.
         """
         
         # check the inputs
@@ -923,7 +920,7 @@ class BaseRSRAnnealResults:
         # check for title
         if title is None:
             # define default
-            self.title = 'RSR: Annealing Sensitivity'
+            self.title = 'SFR: Annealing'
         # check if it is float
         elif isinstance(title, str):
             # assign input value
@@ -1067,10 +1064,10 @@ class BaseRSRAnnealResults:
 
 
 # define BaseScoreResults class
-class BaseRSRScoreResults:
+class BaseSFRScoreResults:
     """
-    Base class for RSRScoreResults.
-    This class should not be used directly. Use derived classes instead.
+    Base class for SFRScoreResults.
+    This class should not be used directly. Use derived user classes instead.
     """
 
     # define init function
@@ -1086,19 +1083,19 @@ class BaseRSRScoreResults:
 
 
     def _output_checks(self):
-        """Output checks for the BaseRSRScoreResults class init."""
+        """Output checks for the BaseSFRScoreResults class init."""
         
         # check and define the output parameters
         sample = self.sample
 
-        # check if the sample is of class RSR
-        if isinstance(sample, Reliability.RSR):
+        # check if the sample is of class SFR
+        if isinstance(sample, Reliability.SFR):
             # assign the value
             self.sample = sample
         else:
             # raise value error
             raise ValueError('sample must be a class of '
-                             'SampleFit.Reliability.RSR '
+                             'SampleFit.Reliability.SFR '
                              f', got {type(sample)}.')
         
         # get exog and endog
@@ -1125,7 +1122,7 @@ class BaseRSRScoreResults:
              figsize=None, s=None, ylim=None, xlim=None, xlabel=None, dpi=None,
              fname=None, jitter=False):
         """
-        RSR Reliability Scores Plot.
+        SFR Scoring Plot.
         """
         
         # check inputs for plot
@@ -1347,7 +1344,7 @@ class BaseRSRScoreResults:
         # check for title
         if title is None:
             # define default
-            self.title = 'RSR: Reliability Scores'
+            self.title = 'SFR: Scoring'
         # check if it is float
         elif isinstance(title, str):
             # assign input value

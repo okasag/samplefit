@@ -1,10 +1,11 @@
 """
-samplefit: Random Sample Reliability.
+samplefit.
 
-Python library to assess Sample Fit via the Random Sample Reliability
-algorithm as developed by Okasa & Younge (2022).
+Python library to assess sample fit in econometric models via
+the Sample Fit Reliability (SFR) approach as developed by
+Okasa & Younge (2022).
 
-Definition of base RSR class and fit, score and anneal methods.
+Definition of base SFR class and fit, score and anneal methods.
 
 """
 
@@ -13,21 +14,20 @@ import statsmodels
 import samplefit.Reliability as Reliability
 
 # import modules
-import numpy as np # (hast to be 1.22.0 at least, due to np.percentile changes)
+import numpy as np
 import pandas as pd
 
 # import submodules and functions
 from joblib import Parallel, delayed, parallel_backend
 from psutil import cpu_count
-# TODO: add check_random_state from statsmodels 0.14.0
 
 
-# %% RSR Class definition
-# define BaseRSR class
-class BaseRSR:
+# %% SFR Class definition
+# define BaseSFR class
+class BaseSFR:
     """
-    Base RSR class of samplefit.
-    This class should not be used directly. Use derived classes instead.
+    Base SFR class of samplefit.
+    This class should not be used directly. Use derived user classes instead.
     """
 
     # define init function
@@ -52,7 +52,7 @@ class BaseRSR:
 
 
     def _input_checks(self):
-        """Input checks for the RSR class init."""
+        """Input checks for the SFR class init."""
         
         # check and define the input parameters
         linear_model = self.linear_model
@@ -241,45 +241,45 @@ class BaseRSR:
 
 
     # %% score function
-    # function to estimate RSR reliability scores
+    # function to estimate SFR reliability scores
     def score(self):
         """
-        RSR reliability scores estimation.
+        SFR Scoring.
         """
         
         # restore bootstrapping
         self.n_boot = None
         
-        # run the RSR algorithm to estimate reliability scores  
-        rsr_scores = self._estimate_scores(endog=self.endog,
+        # run the SFR algorithm to estimate reliability scores  
+        sfr_scores = self._estimate_scores(endog=self.endog,
                                            exog=self.exog,
                                            n_samples=self.n_samples,
                                            min_samples=self.min_samples,
                                            loss=self.loss_function)
         
         # compute gini coefficient of the scores
-        self.gini = self._gini_coef(rsr_scores)
+        self.gini = self._gini_coef(sfr_scores)
 
         # assign estimated reliability scores
-        self.scores = rsr_scores
+        self.scores = sfr_scores
         
         # return the scores as own ScoreClass
-        return Reliability.RSRScoreResults(sample=self)
+        return Reliability.SFRScoreResults(sample=self)
     
     
     # %% fit
     # function to fit the linear model via weighted least squares
     def fit(self, weights=None, n_boot=None):
         """
-        RSR weighted fit.
+        SFR Fitting.
 
         """
 
         # check fit inputs
-        rsr_scores = self._check_fit_inputs(weights, n_boot)
+        sfr_scores = self._check_fit_inputs(weights, n_boot)
         
         # compute gini coefficient of the scores
-        self.gini = self._gini_coef(rsr_scores)
+        self.gini = self._gini_coef(sfr_scores)
         
         # fit the reliable model: weighted fit
         betas = self._weighted_fit(endog=self.endog,
@@ -299,8 +299,8 @@ class BaseRSR:
             # bootstrap approximation
             betas_se, boot_betas = self._boot_se()
 
-        # return the result as RSRFitResults class
-        return Reliability.RSRFitResults(sample=self,
+        # return the result as SFRFitResults class
+        return Reliability.SFRFitResults(sample=self,
                                          params=betas,
                                          params_boot=boot_betas,
                                          stand_err=betas_se,
@@ -311,14 +311,14 @@ class BaseRSR:
     # function for annealing sensitivity analysis based on reliability scores
     def anneal(self, share=0.05, n_boot=None):
         """
-        RSR annealing sensitivity analysis.
+        SFR Annealing.
         """
         
         # check anneal inputs
-        rsr_scores = self._check_anneal_inputs(share, n_boot)
+        sfr_scores = self._check_anneal_inputs(share, n_boot)
         
         # compute gini coefficient of the scores
-        self.gini = self._gini_coef(rsr_scores)
+        self.gini = self._gini_coef(sfr_scores)
         
         # remove sequantially share*n_obs of most unreliable datapoints
         self.n_drop = int(np.ceil(self.share * self.n_obs))
@@ -326,7 +326,7 @@ class BaseRSR:
         # annealing fit
         betas, betas_se, drop_idx = self._annealing_fit(endog=self.endog,
                                                         exog=self.exog,
-                                                        scores=rsr_scores,
+                                                        scores=sfr_scores,
                                                         n_drop=self.n_drop)
         
         # estimate standard errors if inference needed
@@ -337,8 +337,8 @@ class BaseRSR:
             # bootstrap approximation
             betas_se, boot_betas = self._boot_se(anneal=True)
         
-        # return the annealing results as RSRAnnealResults class
-        return Reliability.RSRAnnealResults(sample=self,
+        # return the annealing results as SFRAnnealResults class
+        return Reliability.SFRAnnealResults(sample=self,
                                             params=betas,
                                             params_boot=boot_betas,
                                             stand_err=betas_se,
@@ -348,7 +348,7 @@ class BaseRSR:
     # %% in-class internal functions definitions
     # function to estimate the reliability scores
     def _estimate_scores(self, endog, exog, n_samples, min_samples, loss):
-        """Estimate the reliability scores via RSR algorithm."""
+        """Estimate the reliability scores via SFR algorithm."""
     
         # controls for the optimization
         iter_loss_value = {}
@@ -448,7 +448,7 @@ class BaseRSR:
     
     # function to compute gini coefficient for reliability scores
     def _gini_coef(self, scores=None):
-        """Compute the Gini coefficient for the RSR scores."""
+        """Compute the Gini coefficient for the SFR scores."""
         
         # sort the scores
         scores = np.sort(scores)
@@ -667,26 +667,26 @@ class BaseRSR:
         return params, params_se, obs_drop
 
 
-    # check if rsr scores have been fitted
+    # check if reliability scores have been fitted
     def _check_fitted_scores(self):
-        """Checks if RSR scores have been fitted and returns scores"""
+        """Checks if reliability scores have been fitted and returns scores"""
         
         # check if reliability scores have been fitted already
         if self.scores is None:
             # estimate the reliability scores first
-            rsr_scores = self._estimate_scores(endog=self.endog,
+            sfr_scores = self._estimate_scores(endog=self.endog,
                                                exog=self.exog,
                                                n_samples=self.n_samples,
                                                min_samples=self.min_samples,
                                                loss=self.loss_function)
             # and assign scores to self
-            self.scores = rsr_scores
+            self.scores = sfr_scores
         else:
             # take the estimated scores
-            rsr_scores = self.scores
+            sfr_scores = self.scores
         
         # return the scores
-        return rsr_scores
+        return sfr_scores
     
     
     # function for fit inputs checks
@@ -713,19 +713,19 @@ class BaseRSR:
                              ", got %s" % type(n_boot))
 
         # check fitted scores
-        rsr_scores = self._check_fitted_scores()
+        sfr_scores = self._check_fitted_scores()
         
         # check weighting option
         if weights is None:
-            # take squared RSR reliability scores as weights as default
-            self.weights = rsr_scores ** 2
+            # take squared reliability scores as weights as default
+            self.weights = sfr_scores ** 2
             # and document this
             self.user_weights = False
         # otherwise check user supplied weights
         elif isinstance(weights, np.ndarray):
             # check if the dimension fits
             if weights.shape == self.endog.shape:
-                # assign weights instead of rsr_scores
+                # assign weights instead of sfr_scores
                 self.weights = weights
                 # and document this
                 self.user_weights = True
@@ -739,8 +739,8 @@ class BaseRSR:
             raise ValueError("weight must be of type numpy array"
                              ", got %s" % type(weights))
             
-        # return rsr scores
-        return rsr_scores
+        # return sfr scores
+        return sfr_scores
 
 
     # function for anneal inputs checks
@@ -767,7 +767,7 @@ class BaseRSR:
                              ", got %s" % type(n_boot))
 
         # get reliability scores
-        rsr_scores = self._check_fitted_scores()
+        sfr_scores = self._check_fitted_scores()
         
         # check the share option
         if isinstance(share, float):
@@ -784,4 +784,4 @@ class BaseRSR:
             raise ValueError("share must be a float"
                              ", got %s" % type(share))
         
-        return rsr_scores
+        return sfr_scores
