@@ -1,4 +1,4 @@
-# Replication: Sample Fit
+# Replication: Sample Fit Reliability
 
 Herein we present the workflow for replicating the results of the paper.
 
