@@ -24,9 +24,20 @@ MANIFEST
 # exclude dist files
 dist/
 
-# exclude replication and testing files
-replication/
+# exclude replication results files, but keep the folders
+# replication results
+/replication/results/**
+!/replication/results/**/
+!/replication/results/**/.gitkeep
+# replication figures
+/replication/figures/**
+!/replication/figures/**/
+!/replication/figures/**/.gitkeep
 
-# exclude data and html files
-data/
+# exclude html files
 html/
+
+# exclude large datasets
+*.Rdata
+*.dta
+
