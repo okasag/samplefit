@@ -2,6 +2,10 @@
 
 # Gabriel Okasa and Kenneth A. Younge
 
+# set the directory to the one of the source file (requires Rstudio)
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+path <- getwd()
+
 # install/load Matching package
 packages <- c("Matching")
 # install not available packages
@@ -17,7 +21,7 @@ data_lalonde <- as.data.frame(cbind(lalonde$re78, lalonde$treat))
 colnames(data_lalonde) <- c("re78", "treatment")
 data_lalonde <- data_lalonde[complete.cases(data_lalonde), ]
 success <- try(write.csv(data_lalonde,
-                         file = "/Users/okasag/Desktop/EPFL/Projects/RMC/code/github/samplefit/replication/data/data_lalonde.csv",
+                         file = paste0(path, "/data/data_lalonde.csv"),
                          row.names = F))
 
 # print message
