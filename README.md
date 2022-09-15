@@ -18,15 +18,17 @@ Repo maintainer: Gabriel Okasa ([okasa.gabriel@gmail.com](mailto:okasa.gabriel@g
 
 `samplefit` is a Python library for the assessment of sample fit in
 econometric models. In particular, `samplefit` implements the Sample Fit
-Reliability (SFR) algorithm, a re-sampling procedure to estimate the
-reliability of data and check the sensitivity of results. To that end,
-SFR is a computational approach with three aspects: *Scoring*, to estimate a 
-point-wise reliability score for every observation in a sample based on the
-expected estimation loss over sub-samples; *Annealing*, to test the sensitivity
-of results to the sequential removal of unreliable data points; and *Fitting*,
-to estimate a weighted regression that adjusts for the reliability of the data.
+Reliability (SFR) algorithm, a re-sampling procedure to estimate the reliability
+of the data, check the sensitivity of the results, and improve the robustness of
+the analysis. To that end, SFR is a computational approach with three aspects:
+*Scoring*, to estimate a reliability score for every observation in a sample
+based on the expected estimation loss over sub-samples; *Annealing*, to test the
+sensitivity of results to the sequential removal of unreliable data; and *Fitting*,
+to estimate a weighted regression that adjusts for the reliability of the sample.
 
 Detailed documentation of the `samplefit` library is available [here](https://okasag.github.io/samplefit/).
+
+Paper describing the SFR algorithm is available [here](https://arxiv.org/pdf/2209.06631.pdf).
 
 ## Installation
 
@@ -92,5 +94,5 @@ sample_annealing.plot()
 
 ## References
 
-- Okasa, Gabriel, and Kenneth A. Younge. “Sample Fit.” Working Paper. 2022.
+- Okasa, Gabriel, and Kenneth A. Younge. “Sample Fit Reliability.” arXiv preprint arXiv:2209.06631. <https://arxiv.org/abs/2209.06631>. 2022.
 - Seabold, Skipper, and Josef Perktold. “statsmodels: Econometric and statistical modeling with python.” Proceedings of the 9th Python in Science Conference. 2010.

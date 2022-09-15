@@ -99,7 +99,8 @@
 
  References
  ----------------------------
- - Okasa, Gabriel, and Kenneth A. Younge. “Sample Fit.” Working Paper. 2022.
+ - Okasa, Gabriel, and Kenneth A. Younge. “Sample Fit Reliability.”
+ arXiv preprint arXiv:2209.06631. 2022.
  - Seabold, Skipper, and Josef Perktold. “statsmodels: Econometric and 
  statistical modeling with python.” Proceedings of the 9th Python in Science 
  Conference. 2010.
