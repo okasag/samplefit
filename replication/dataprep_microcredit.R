@@ -2,9 +2,15 @@
 
 # Gabriel Okasa and Kenneth A. Younge
 
-# set the directory to the one of the source file (requires Rstudio)
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-path <- getwd()
+# install/load this.path package
+packages <- c("this.path")
+# install not available packages
+install.packages(setdiff(packages, rownames(installed.packages()))) 
+# load packages
+lapply(packages, require, character.only = TRUE)
+
+# set the directory to the one of the source file
+path <- dirname(this.path())
 
 # load data
 load(paste0(path, "/data/microcredit_project_data.RData"))

@@ -2,16 +2,15 @@
 
 # Gabriel Okasa and Kenneth A. Younge
 
-# set the directory to the one of the source file (requires Rstudio)
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-path <- getwd()
-
-# install/load haven package
-packages <- c("haven")
+# install/load haven and this.path packages
+packages <- c("haven", "this.path")
 # install not available packages
 install.packages(setdiff(packages, rownames(installed.packages()))) 
 # load packages
 lapply(packages, require, character.only = TRUE)
+
+# set the directory to the one of the source file
+path <- dirname(this.path())
 
 # load dta file
 data <- read_dta(file = paste0(path, "/data/AER merged.dta")) 
